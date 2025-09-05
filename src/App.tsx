@@ -41,6 +41,9 @@ export function App() {
 							I am a {age} years old student, looking for experience and self
 							development.
 						</p>
+            <p className="text-slate-900 mt-3">
+              Currently coding production-ready bugs at Roxcode.
+            </p>
 						<address className="mt-12">
 							<div className="flex flex-col md:flex-row">
 								<div className="mr-2">
