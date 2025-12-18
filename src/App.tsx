@@ -47,7 +47,7 @@ export function App() {
 						<address className="mt-12">
 							<div className="flex flex-col md:flex-row">
 								<div className="mr-2">
-									<BlockyLink href="https://github.com/Coffee-for-Cats">
+									<BlockyLink href="https://github.com/sh-lucas">
 										Github
 									</BlockyLink>
 								</div>
