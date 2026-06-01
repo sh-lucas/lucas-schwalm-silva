@@ -1,15 +1,17 @@
-import React, { useState } from 'react'
+import type React from 'react'
+import { useState } from 'react'
 import { ProjectsComponent } from './projects'
 import { TechnologiesComponent } from './techs'
 
-export function Selector() {
-	const [open, setOpen] = useState('University')
-	console.log(open)
+type TabType = 'Formal Experience' | 'Techs' | 'Personal Projects'
 
-	const blocks = {
-		University: <University />,
+export function Selector() {
+	const [open, setOpen] = useState<TabType>('Formal Experience')
+
+	const blocks: Record<TabType, React.ReactNode> = {
+		'Formal Experience': <FormalExperience />,
 		Techs: <Techs />,
-		Projects: <Projects />,
+		'Personal Projects': <PersonalProjects />,
 	}
 
 	const errorMsg = 'Sorry, this should not be happening =('
@@ -18,7 +20,7 @@ export function Selector() {
 		<section className="m-2 p-2">
 			<div className="flex">
 				<SectionHeader setter={setOpen} getter={open}>
-					University
+					Formal Experience
 				</SectionHeader>
 
 				<SectionHeader setter={setOpen} getter={open}>
@@ -26,20 +28,25 @@ export function Selector() {
 				</SectionHeader>
 
 				<SectionHeader setter={setOpen} getter={open}>
-					Projects
+					Personal Projects
 				</SectionHeader>
 			</div>
 
 			<div className="mx-2 my-4">
 				{/* Pretty confusing, but I promise it makes sense =p */}
-				{(blocks[open] ? blocks[open] : errorMsg) || errorMsg}
+				{blocks[open] || errorMsg}
 			</div>
 		</section>
 	)
 }
 
-// typescripts gets messy after some time, better without
-function SectionHeader({ children, setter, getter }) {
+interface SectionHeaderProps {
+	children: TabType
+	setter: (tab: TabType) => void
+	getter: TabType
+}
+
+function SectionHeader({ children, setter, getter }: SectionHeaderProps) {
 	const underlined = getter === children ? 'underline' : ' '
 
 	return (
@@ -56,21 +63,40 @@ function SectionHeader({ children, setter, getter }) {
 	)
 }
 
-function University() {
+function FormalExperience() {
 	return (
-		<div>
-			<h2 className="text-2xl font-semibold text-slate-800">
-				⚙️ Engenharia de Computação 💻
-			</h2>
-			<p className="my-1">
-				<span className="text-indigo-950 font-semibold">UERGS</span> -
-				Universidade Estadual do Rio Grande do Sul <br />
-				Guaíba - RS | Brazil
-			</p>
-			<p>
-				<span className="text-slate-800 font-semibold">2023/2</span> -{' '}
-				<span className="text-slate-800 font-semibold">2027/2</span> (expected)
-			</p>
+		<div className="flex flex-col gap-6">
+			<div>
+				<h2 className="text-2xl font-semibold text-slate-800">
+					🚀 Full stack engineer
+				</h2>
+				<p className="my-1">
+					<span className="text-indigo-950 font-semibold">Roxcode</span> <br />
+					Brazil (Remote)
+				</p>
+				<p>
+					<span className="text-slate-800 font-semibold">2024/09</span> -{' '}
+					<span className="text-slate-800 font-semibold">Present</span>
+				</p>
+			</div>
+
+			<div className="border-t border-zinc-300 my-4" />
+
+			<div>
+				<h2 className="text-2xl font-semibold text-slate-800">
+					⚙️ Engenharia de Computação 💻
+				</h2>
+				<p className="my-1">
+					<span className="text-indigo-950 font-semibold">UERGS</span> -
+					Universidade Estadual do Rio Grande do Sul <br />
+					Guaíba - RS | Brazil
+				</p>
+				<p>
+					<span className="text-slate-800 font-semibold">2023/2</span> -{' '}
+					<span className="text-slate-800 font-semibold">2027/2</span>{' '}
+					(expected)
+				</p>
+			</div>
 		</div>
 	)
 }
@@ -79,6 +105,6 @@ function Techs() {
 	return <TechnologiesComponent />
 }
 
-function Projects() {
+function PersonalProjects() {
 	return <ProjectsComponent />
 }

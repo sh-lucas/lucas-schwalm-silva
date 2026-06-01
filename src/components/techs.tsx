@@ -2,54 +2,62 @@ import React from 'react'
 
 export function TechnologiesComponent() {
 	return (
-		<>
-			<h2 className="mt-2 text-lg font-semibold text-slate-800">Proeficient</h2>
-			<div className="flex">
-        <img
-					className="w-8 mr-3"
-					alt="golang"
-					src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/go/go-original.svg"
-				/>
-				<img
-					className="w-8 mr-3"
-					alt="typescript"
-					src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/typescript/typescript-original.svg"
-				/>
+		<div className="flex flex-col gap-6">
+			<div>
+				<h2 className="text-2xl font-semibold text-slate-800">Proficient</h2>
+				<div className="flex flex-wrap gap-6 mt-4">
+					<div className="flex items-center">
+						<img
+							className="w-10 mr-3"
+							alt="golang"
+							src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/go/go-original.svg"
+						/>
+						<span className="text-lg text-slate-800 font-medium">Go</span>
+					</div>
+					<div className="flex items-center">
+						<img
+							className="w-10 mr-3"
+							alt="typescript"
+							src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/typescript/typescript-original.svg"
+						/>
+						<span className="text-lg text-slate-800 font-medium">
+							TypeScript
+						</span>
+					</div>
+					<div className="flex items-center">
+						<img
+							className="w-10 mr-3"
+							alt="c"
+							src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/c/c-original.svg"
+						/>
+						<span className="text-lg text-slate-800 font-medium">C</span>
+					</div>
+				</div>
 			</div>
-			<h2 className="mt-3 text-lg font-semibold text-slate-800">In progress</h2>
-			<div className="flex">
-				<img
-					className="w-8 mr-3"
-					alt="react"
-					src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/react/react-original.svg"
-				/>
-        <img 
-          className="w-8 mr-3"
-					alt="mongodb"
-          src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/mongodb/mongodb-original.svg" 
-        />
-        <img 
-          className="w-8 mr-3"
-					alt="rabbitmq"
-          src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/rabbitmq/rabbitmq-original.svg"
-        />
-           
+
+			<div className="border-t border-zinc-300 my-2" />
+
+			<div>
+				<h2 className="text-2xl font-semibold text-slate-800">In progress</h2>
+				<div className="flex flex-wrap gap-6 mt-4">
+					<div className="flex items-center">
+						<img
+							className="w-10 mr-3"
+							alt="react"
+							src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/react/react-original.svg"
+						/>
+						<span className="text-lg text-slate-800 font-medium">React</span>
+					</div>
+					<div className="flex items-center">
+						<img
+							className="w-10 mr-3"
+							alt="rust"
+							src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/rust/rust-original.svg"
+						/>
+						<span className="text-lg text-slate-800 font-medium">Rust</span>
+					</div>
+				</div>
 			</div>
-			<h2 className="mt-2 text-lg font-semibold text-slate-800">
-				Previous Contacts
-			</h2>
-			<div className="flex">
-				<img
-					className="w-6 mr-3"
-					alt="rust"
-					src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/rust/rust-original.svg"
-				/>
-				<img
-					className="w-8 mr-3 -mt-1"
-					alt="java"
-					src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/java/java-original.svg"
-				/>
-			</div>
-		</>
+		</div>
 	)
 }

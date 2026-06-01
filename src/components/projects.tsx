@@ -3,33 +3,41 @@ import React from 'react'
 export function ProjectsComponent() {
 	return (
 		<>
-			<h2 className="text-indigo-950 text-2xl font-semibold">Projects</h2>
+			<h2 className="text-indigo-950 text-2xl font-semibold">
+				Personal Projects
+			</h2>
 			<Project
-				link="https://www.uergs.edu.br/pro-reitoria-de-pesquisa-e-pos-graduacao-desenvolve-sistema-proprio-de-submissao-de-projetos-de-pesquisa"
-				name="SSP UERGS"
-				techs="PHP, JS, Bootstrap"
-				desc="A Project Submission System for master's students. I was an scholarship holder and active contributor for the project."
+				link="https://github.com/sh-lucas/teapot"
+				name="Teapot"
+				techs="Go, WebSockets, HTML"
+				desc="See your Docker container's console output live on a clean web page."
 			/>
 			<Project
-				link="https://github.com/Coffee-for-Cats/kes-simulator"
-				name="K&S Simulator"
-				techs="TS, ASM"
-				desc="A Knob and Switch simulator, often used for teaching assembly; I built
-						to improve usuability and acessibility for my colleagues and teachers."
+				link="https://github.com/sh-lucas/libsql-handler"
+				name="libsql-handler"
+				techs="Go"
+				desc="A simple libsql hrana protocol implementation to ease access to remote databases without the need for running sqld."
 			/>
 			<Project
-				link="https://github.com/Coffee-for-Cats/golang-quizzes"
-				name="Golang Quizzes"
-				techs="Go, Postgres, Docker Compose"
-				desc="A golang server, implementing a quiz application with authentication."
+				link="https://github.com/sh-lucas/goproxy"
+				name="GoProxy"
+				techs="Go, YAML"
+				desc="Simple reverse proxy. Redirect requests from prefixes to the hosts configured via YAML."
 			/>
 		</>
 	)
 }
 
-export function Project({ link, name, techs, desc }) {
+export interface ProjectProps {
+	link: string
+	name: string
+	techs: string
+	desc: string
+}
+
+export function Project({ link, name, techs, desc }: ProjectProps) {
 	return (
-		<div className="mt-2">
+		<div className="mt-8">
 			<div className="flex flex-col md:flex-row md:items-center">
 				<a
 					className="text-lg text-slate-800 font-semibold underline"

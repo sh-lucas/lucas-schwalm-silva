@@ -1,6 +1,11 @@
-import React from 'react'
+import type React from 'react'
 
-export function BlockyLink({ children, href }) {
+interface BlockyLinkProps {
+	children: React.ReactNode
+	href: string
+}
+
+export function BlockyLink({ children, href }: BlockyLinkProps) {
 	return (
 		<a
 			target="__blank"
