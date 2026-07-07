@@ -211,8 +211,8 @@ export function App() {
     }
   }, [])
 
-  // Coffee capacity calculations
-  const recommendedCoffeeCups = Math.max(1, Math.ceil(metrics.load_avg * 12))
+  // Coffee capacity calculations: recommended cups equals the load average rounded down (min 1)
+  const recommendedCoffeeCups = Math.max(1, Math.floor(metrics.load_avg))
 
   return (
     <>
@@ -387,8 +387,8 @@ export function App() {
                   </p>
                 </div>
 
-                {/* Panic banner alerts */}
-                {metrics.load_avg > 0.3 && (
+                {/* Panic banner alerts (dispara apenas com load de servidor crítico) */}
+                {metrics.load_avg >= 8.0 && (
                   <div className="panic-banner">
                     <div className="panic-title">
                       <AlertTriangle size={18} className="glow-text" />
@@ -437,7 +437,7 @@ export function App() {
                     label="Coffees needed today"
                     value={recommendedCoffeeCups}
                     unit="cups"
-                    percent={metrics.load_avg * 40}
+                    percent={Math.min(100, (metrics.load_avg / 8) * 100)}
                     barColor="var(--accent-amber)"
                     updateFlash={updateFlash}
                     description="Kernel average load — higher load, more coffee."
