@@ -1,0 +1,7 @@
+node_modules
+target
+out
+dist
+.vscode
+.DS_Store
+*.local
