@@ -709,13 +709,13 @@ export function App() {
 											marginTop: '0.2rem',
 										}}
 									>
-										Personal k3s setup on Oracle Free Tier · Last sync:{' '}
+										Self-hosted k3s single-node cluster - Last sync:{' '}
 										{lastUpdated.toLocaleTimeString()}
 									</p>
 								</div>
 
 								{/* Panic banner alerts (dispara apenas com load de servidor crítico) */}
-								{metrics.load_avg >= 8.0 && (
+								{/* {metrics.load_avg >= 8.0 && (
 									<div className="panic-banner">
 										<div className="panic-title">
 											<AlertTriangle size={18} className="glow-text" />
@@ -731,7 +731,7 @@ export function App() {
 											Load: {metrics.load_avg.toFixed(2)}
 										</span>
 									</div>
-								)}
+								)} */}
 
 								{/* Metrics Grid */}
 								<div className="metrics-grid">
@@ -743,7 +743,7 @@ export function App() {
 										percent={metrics.cpu_percent}
 										barColor="var(--accent-primary)"
 										updateFlash={updateFlash}
-										description="Current kernel CPU load on the free tier VPS."
+										description="Current usage across the 2 exclusive virtual CPU cores."
 									/>
 									<MetricCard
 										icon={
@@ -758,7 +758,7 @@ export function App() {
 										percent={metrics.memory_percent}
 										barColor="var(--accent-cyan)"
 										updateFlash={updateFlash}
-										description="RAM usage across all running processes."
+										description="Cache-free RAM usage across all running services out of 12 GB."
 									/>
 									<MetricCard
 										icon={
@@ -788,7 +788,7 @@ export function App() {
 										percent={Math.min(100, (metrics.load_avg / 8) * 100)}
 										barColor="var(--accent-amber)"
 										updateFlash={updateFlash}
-										description="Kernel average load — higher load, more coffee."
+										description="Average scheduler's task queue length. Should be low on my stack."
 									/>
 								</div>
 
