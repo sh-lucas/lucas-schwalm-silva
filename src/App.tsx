@@ -767,13 +767,13 @@ export function App() {
 												style={{ color: 'var(--accent-emerald)' }}
 											/>
 										}
-										label="Max kitten memes folder size"
-										value={((1 - metrics.disk_percent / 100) * 150).toFixed(1)}
+										label="Kitten memes folder size"
+										value={((metrics.disk_percent / 100) * 150).toFixed(1)}
 										unit="GB"
 										percent={metrics.disk_percent}
 										barColor="var(--accent-emerald)"
 										updateFlash={updateFlash}
-										description="Available disk space on the 150 GB NVMe."
+										description="Used disk space on the 150 GB NVMe."
 									/>
 									<MetricCard
 										icon={
