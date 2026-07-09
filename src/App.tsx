@@ -24,7 +24,7 @@ interface SystemMetrics {
 	load_avg: number
 	memory_percent: number
 	uptime_percent: number
-	avg_psi?: number
+	avg_psi: number
 }
 
 // Route <-> tab mapping
@@ -237,9 +237,6 @@ export function App() {
 			if (reconnectTimeout) clearTimeout(reconnectTimeout)
 		}
 	}, [])
-
-	// Coffee capacity calculations: recommended cups based on avg_psi (4% = 1 cup)
-	const recommendedCoffeeCups = ((metrics.avg_psi ?? 0) / 4).toFixed(1)
 
 	return (
 		<>
@@ -804,12 +801,12 @@ export function App() {
 											/>
 										}
 										label="Coffees needed today"
-										value={recommendedCoffeeCups}
+										value={metrics.avg_psi}
 										unit="cups"
 										percent={Math.min(100, ((metrics.avg_psi ?? 0) / 20) * 100)}
 										barColor="var(--accent-amber)"
 										updateFlash={updateFlash}
-										description="Average resource pressure (PSI)."
+										description="Average resource pressure (psi). Ranges 0-100."
 									/>
 								</div>
 
