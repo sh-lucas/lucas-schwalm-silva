@@ -1,6 +1,5 @@
 import {
 	Activity,
-	AlertTriangle,
 	Coffee,
 	Cpu,
 	ExternalLink,
@@ -25,6 +24,7 @@ interface SystemMetrics {
 	load_avg: number
 	memory_percent: number
 	uptime_percent: number
+	avg_psi?: number
 }
 
 // Route <-> tab mapping
@@ -69,15 +69,35 @@ const PROJECTS = [
 const PRODUCTION_EXCUSES = [
 	'The Garbage Collector decided to take an extended coffee break.',
 	'A rogue loop in the Kubernetes Scheduler is currently questioning its life choices.',
-	'NixOS is rebuilding the universe from scratch. Again.',
+	'The ssh key expired somehow and I did not notice.',
 	'The Docker daemon has temporarily transitioned to a spiritual retreat.',
-	'A cloud provider engineer tripped over a Tailscale fiber cable.',
+	'A cloud provider engineer tripped over a fiber cable.',
 	'The CPU is just running a thermal workout to keep the server farm warm.',
 	"It works on my machine. Have you checked if your hemisphere's gravity is reversed?",
 	'A microservice entered a reactive existential crisis.',
-	"A junior developer (me) committed a 'temporary' testing endpoint to production.",
+	"A junior developer committed a 'temporary' testing endpoint to production.",
 	'The database connection pool is currently social distancing.',
 	'A cosmic ray hit the exact transistor hosting the index page.',
+	"I forgot to renew the domain.",
+	"The CI/CD pipeline decided to rebuild the Universe.",
+	'A temporary log file currently weights 4.2TB.',
+	'Someone ran a regex that is still backtracking from 1999.',
+	'The server is actually online, just not publicly reachable right now.',
+	"PHP's fault, actually.",
+	'DNS propagation is currently traveling at the speed of continental drift.',
+	'The immutable system configuration mutated itself out of existence (again).',
+	'The background workers formed a union and went on strike.',
+	'The SSL certificate expired exactly 3 seconds after the sysadmin went to sleep.',
+	'We accidentally deployed the local mock database to us-east-1.',
+	'The system ran out of file descriptors and dignity.',
+	'A deadlock occurred between the main thread and the coffee machine.',
+	'The load balancer is distributing pure chaos equally across all nodes.',
+	'We hit the integer overflow limit on our cloud provider billing account.',
+	'We removed the french documentation to save some space and it stopped working.',
+	'We deleted an empty file named "temporary-log_v2(3).txt" and now the rollback is also broken.',
+	'The scheduler entered a priority inversion loop and forgot how to count.',
+	'We decided to turn it off to save some energy for tomorrow.',
+	'You are absolutely right! ...',
 ]
 
 export function App() {
@@ -97,6 +117,7 @@ export function App() {
 		load_avg: 0,
 		memory_percent: 0,
 		uptime_percent: 0,
+		avg_psi: 0,
 	})
 
 	// Connection states
@@ -217,8 +238,8 @@ export function App() {
 		}
 	}, [])
 
-	// Coffee capacity calculations: recommended cups equals the load average formatted to one decimal place
-	const recommendedCoffeeCups = metrics.load_avg.toFixed(1)
+	// Coffee capacity calculations: recommended cups based on avg_psi (4% = 1 cup)
+	const recommendedCoffeeCups = ((metrics.avg_psi ?? 0) / 4).toFixed(1)
 
 	return (
 		<>
@@ -785,10 +806,10 @@ export function App() {
 										label="Coffees needed today"
 										value={recommendedCoffeeCups}
 										unit="cups"
-										percent={Math.min(100, (metrics.load_avg / 8) * 100)}
+										percent={Math.min(100, ((metrics.avg_psi ?? 0) / 20) * 100)}
 										barColor="var(--accent-amber)"
 										updateFlash={updateFlash}
-										description="Average scheduler's task queue length. Should be low on my stack."
+										description="Average resource pressure (PSI)."
 									/>
 								</div>
 
