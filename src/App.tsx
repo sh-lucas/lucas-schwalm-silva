@@ -801,10 +801,18 @@ export function App() {
 										label="Coffees needed today"
 										value={metrics.avg_psi}
 										unit="cups"
-										percent={Math.min(100, ((metrics.avg_psi ?? 0) / 20) * 100)}
+										percent={
+											(metrics.avg_psi ?? 0) <= 20
+												? ((metrics.avg_psi ?? 0) / 20) * 70
+												: 70 + (((metrics.avg_psi ?? 0) - 20) / 80) * 30
+										}
 										barColor="var(--accent-amber)"
 										updateFlash={updateFlash}
 										description="Average resource pressure (psi). Ranges 0-100."
+										ticks={[
+											{ percent: 70, label: '20%' },
+											{ percent: 100, label: '100%' },
+										]}
 									/>
 								</div>
 

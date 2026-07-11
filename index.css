@@ -526,12 +526,17 @@ h1, h2, h3, h4 {
   font-family: var(--font-mono);
 }
 
+.metric-bar-wrapper {
+  position: relative;
+  margin-top: 0.6rem;
+  padding-bottom: 1.2rem;
+}
+
 .metric-bar-bg {
   width: 100%;
   height: 4px;
   background: rgba(255, 255, 255, 0.06);
   border-radius: 2px;
-  margin-top: 0.6rem;
   overflow: hidden;
 }
 
@@ -540,6 +545,48 @@ h1, h2, h3, h4 {
   border-radius: 2px;
   transition: width 1.2s cubic-bezier(0.1, 0.8, 0.25, 1);
   background: var(--accent-primary);
+}
+
+.metric-ticks-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.metric-tick {
+  display: flex;
+  flex-direction: column;
+  top: -3px;
+}
+
+.metric-tick.align-left {
+  align-items: flex-start;
+}
+
+.metric-tick.align-right {
+  align-items: flex-end;
+}
+
+.metric-tick.align-center {
+  align-items: center;
+}
+
+.metric-tick-line {
+  width: 2px;
+  height: 10px;
+  background: rgba(255, 255, 255, 0.75);
+}
+
+.metric-tick-label {
+  font-size: 0.65rem;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  margin-top: 4px;
+  line-height: 1;
 }
 
 .metric-description {
