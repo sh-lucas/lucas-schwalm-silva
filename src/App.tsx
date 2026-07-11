@@ -755,13 +755,13 @@ export function App() {
 								<div className="metrics-grid">
 									<MetricCard
 										icon={<Cpu className="metric-icon" />}
-										label="CPU Usage"
+										label="Hamster Wheel Speed"
 										value={metrics.cpu_percent.toFixed(1)}
 										unit="%"
 										percent={metrics.cpu_percent}
 										barColor="var(--accent-primary)"
 										updateFlash={updateFlash}
-										description="Current usage across the 2 exclusive virtual CPU cores."
+										description="Current CPU usage across the 2 (exclusive) virtual cores."
 									/>
 									<MetricCard
 										icon={
@@ -770,7 +770,7 @@ export function App() {
 												style={{ color: 'var(--accent-cyan)' }}
 											/>
 										}
-										label="Memory"
+										label="Thermos Bottle Emptiness"
 										value={metrics.memory_percent.toFixed(1)}
 										unit="%"
 										percent={metrics.memory_percent}
