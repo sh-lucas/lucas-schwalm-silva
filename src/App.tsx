@@ -753,7 +753,7 @@ export function App() {
 								<div className="metrics-grid">
 									<MetricCard
 										icon={<Cpu className="metric-icon" />}
-										label="Hamster Wheel Speed"
+										label="Hamster Wheel Speed (CPU %)"
 										value={metrics.cpu_percent.toFixed(1)}
 										unit="%"
 										percent={metrics.cpu_percent}
@@ -768,7 +768,7 @@ export function App() {
 												style={{ color: 'var(--accent-cyan)' }}
 											/>
 										}
-										label="Thermos Bottle Emptiness"
+										label="Thermos Bottle Level (RAM)"
 										value={metrics.memory_percent.toFixed(1)}
 										unit="%"
 										percent={metrics.memory_percent}
@@ -783,7 +783,7 @@ export function App() {
 												style={{ color: 'var(--accent-emerald)' }}
 											/>
 										}
-										label="Kitten memes folder size"
+										label="Kitten memes folder size (disk)"
 										value={((metrics.disk_percent / 100) * 150).toFixed(1)}
 										unit="GB"
 										percent={metrics.disk_percent}
@@ -798,7 +798,7 @@ export function App() {
 												style={{ color: 'var(--accent-amber)' }}
 											/>
 										}
-										label="Coffees needed today"
+										label="Coffees needed (PSI %)"
 										value={metrics.avg_psi}
 										unit="cups"
 										percent={
@@ -808,7 +808,7 @@ export function App() {
 										}
 										barColor="var(--accent-amber)"
 										updateFlash={updateFlash}
-										description="Average resource pressure (psi). Ranges 0-100."
+										description="Average resource pressure. Ranges 0-100% but 20%+ is already resource starvation."
 										ticks={[
 											{ percent: 70, label: '20%' },
 											{ percent: 100, label: '100%' },
