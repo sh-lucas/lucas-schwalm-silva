@@ -434,8 +434,7 @@ export function App() {
 											lineHeight: '1.55',
 										}}
 									>
-										API integrations, system design, and container deployments.
-										Day-to-day stack: Go, MongoDB, TypeScript, RabbitMQ.
+										Web development, NodeJS and React maintenance, Golang and microservices architecture.
 									</p>
 									<div
 										style={{
@@ -445,7 +444,7 @@ export function App() {
 											marginTop: '0.75rem',
 										}}
 									>
-										{['Go', 'MongoDB', 'TypeScript', 'RabbitMQ'].map((t) => (
+										{['Go', 'MongoDB', 'TypeScript', 'RabbitMQ', 'SQL'].map((t) => (
 											<span
 												key={t}
 												style={{
@@ -514,8 +513,7 @@ export function App() {
 											lineHeight: '1.55',
 										}}
 									>
-										Compilers, parallel computing, hardware interfaces,
-										low-level scheduling. Strong math foundation.
+										Hardware architecture, Parallel computing, Low-level programming. Strong math foundation.
 									</p>
 									<div
 										style={{
@@ -624,7 +622,7 @@ export function App() {
 													fontWeight: 500,
 												}}
 											>
-												checkup — server metrics API
+												checkup — Live monitor's API
 											</p>
 											<p
 												style={{
