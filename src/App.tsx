@@ -619,8 +619,7 @@ export function App() {
 													lineHeight: '1.5',
 												}}
 											>
-												Running a personal Kubernetes cluster on Oracle Free
-												Tier. Podman, NixOS, Cloudflare Tunnels.
+												Running a personal Kubernetes cluster on a Virtual Machine. Docker/Podman, GitOps, Cloudflare and Networking.
 											</p>
 											<div
 												style={{
