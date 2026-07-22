@@ -11,6 +11,7 @@ import {
 import { useEffect, useState } from 'react'
 import { Navigate, useLocation, useNavigate } from 'react-router-dom'
 
+import { BackgroundSVG } from './components/BackgroundSVG'
 import { ExcuseGenerator } from './components/ExcuseGenerator'
 // Component imports
 import { MetricCard } from './components/MetricCard'
@@ -78,8 +79,8 @@ const PRODUCTION_EXCUSES = [
 	"A junior developer committed a 'temporary' testing endpoint to production.",
 	'The database connection pool is currently social distancing.',
 	'A cosmic ray hit the exact transistor hosting the index page.',
-	"I forgot to renew the domain.",
-	"The CI/CD pipeline decided to rebuild the Universe.",
+	'I forgot to renew the domain.',
+	'The CI/CD pipeline decided to rebuild the Universe.',
 	'A temporary log file currently weights 4.2TB.',
 	'Someone ran a regex that is still backtracking from 1999.',
 	'The server is actually online, just not publicly reachable right now.',
@@ -240,6 +241,8 @@ export function App() {
 
 	return (
 		<>
+			{/* Dark Navy Marble Stain SVG Background */}
+			<BackgroundSVG />
 			{/* Redirect / → /metrics */}
 			{pathname === '/' && <Navigate to="/metrics" replace />}
 			<div className="app-wrapper">
@@ -434,7 +437,8 @@ export function App() {
 											lineHeight: '1.55',
 										}}
 									>
-										Web development, NodeJS and React maintenance, Golang and microservices architecture.
+										Web development, NodeJS and React maintenance, Golang and
+										microservices architecture.
 									</p>
 									<div
 										style={{
@@ -444,22 +448,24 @@ export function App() {
 											marginTop: '0.75rem',
 										}}
 									>
-										{['Go', 'MongoDB', 'TypeScript', 'RabbitMQ', 'SQL'].map((t) => (
-											<span
-												key={t}
-												style={{
-													fontFamily: 'var(--font-mono)',
-													fontSize: '0.72rem',
-													color: 'var(--text-muted)',
-													background: 'rgba(255,255,255,0.05)',
-													padding: '0.15rem 0.5rem',
-													borderRadius: '4px',
-													border: '1px solid var(--border-color)',
-												}}
-											>
-												{t}
-											</span>
-										))}
+										{['Go', 'MongoDB', 'TypeScript', 'RabbitMQ', 'SQL'].map(
+											(t) => (
+												<span
+													key={t}
+													style={{
+														fontFamily: 'var(--font-mono)',
+														fontSize: '0.72rem',
+														color: 'var(--text-muted)',
+														background: 'rgba(255,255,255,0.05)',
+														padding: '0.15rem 0.5rem',
+														borderRadius: '4px',
+														border: '1px solid var(--border-color)',
+													}}
+												>
+													{t}
+												</span>
+											),
+										)}
 									</div>
 								</div>
 
@@ -513,7 +519,8 @@ export function App() {
 											lineHeight: '1.55',
 										}}
 									>
-										Hardware architecture, Parallel computing, Low-level programming. Strong math foundation.
+										Hardware architecture, Parallel computing, Low-level
+										programming. Strong math foundation.
 									</p>
 									<div
 										style={{
