@@ -25,7 +25,7 @@ export function BackgroundSVG() {
 					>
 						<feTurbulence
 							type="fractalNoise"
-							baseFrequency="0.018 0.009"
+							baseFrequency="0.02 0.01"
 							numOctaves="4"
 							seed="35"
 							result="noise"
@@ -33,10 +33,10 @@ export function BackgroundSVG() {
 						<feColorMatrix
 							type="matrix"
 							values="
-								0 0 0 0 0.05
-								0 0 0 0 0.10
-								0 0 0 0 0.20
-								0 0 0 0.08 0"
+								0 0 0 0 0.12
+								0 0 0 0 0.18
+								0 0 0 0 0.28
+								0 0 0 0.32 0"
 							result="coloredNoise"
 						/>
 						<feComposite operator="in" in2="SourceGraphic" />
@@ -62,9 +62,9 @@ export function BackgroundSVG() {
 
 					{/* Elegant Navy Marble Stain Gradients */}
 					<linearGradient id="stain-grad-1" x1="0%" y1="0%" x2="100%" y2="100%">
-						<stop offset="0%" stopColor="#0b1730" stopOpacity="0.9" />
-						<stop offset="45%" stopColor="#14284d" stopOpacity="0.75" />
-						<stop offset="85%" stopColor="#0a1224" stopOpacity="0.95" />
+						<stop offset="0%" stopColor="#091122" stopOpacity="0.95" />
+						<stop offset="45%" stopColor="#0e1b33" stopOpacity="0.7" />
+						<stop offset="85%" stopColor="#070d1a" stopOpacity="0.95" />
 					</linearGradient>
 
 					<linearGradient
@@ -74,21 +74,21 @@ export function BackgroundSVG() {
 						x2="10%"
 						y2="90%"
 					>
-						<stop offset="0%" stopColor="#16305a" stopOpacity="0.65" />
-						<stop offset="50%" stopColor="#0e1f3d" stopOpacity="0.8" />
-						<stop offset="100%" stopColor="#122547" stopOpacity="0.4" />
+						<stop offset="0%" stopColor="#0d1b33" stopOpacity="0.45" />
+						<stop offset="50%" stopColor="#09152b" stopOpacity="0.6" />
+						<stop offset="100%" stopColor="#0a172e" stopOpacity="0.3" />
 					</linearGradient>
 
 					<radialGradient id="stain-grad-3" cx="70%" cy="30%" r="65%">
-						<stop offset="0%" stopColor="#1e3e70" stopOpacity="0.45" />
-						<stop offset="50%" stopColor="#102344" stopOpacity="0.3" />
-						<stop offset="100%" stopColor="#080e1b" stopOpacity="0" />
+						<stop offset="0%" stopColor="#10223d" stopOpacity="0.35" />
+						<stop offset="50%" stopColor="#0a172c" stopOpacity="0.25" />
+						<stop offset="100%" stopColor="#060b14" stopOpacity="0" />
 					</radialGradient>
 
 					<linearGradient id="vein-grad" x1="0%" y1="0%" x2="100%" y2="80%">
-						<stop offset="0%" stopColor="#305a96" stopOpacity="0.35" />
-						<stop offset="50%" stopColor="#477ac2" stopOpacity="0.25" />
-						<stop offset="100%" stopColor="#1b3666" stopOpacity="0.05" />
+						<stop offset="0%" stopColor="#1e385e" stopOpacity="0.3" />
+						<stop offset="50%" stopColor="#2b4d7a" stopOpacity="0.2" />
+						<stop offset="100%" stopColor="#10223d" stopOpacity="0.05" />
 					</linearGradient>
 
 					<linearGradient
@@ -98,9 +98,9 @@ export function BackgroundSVG() {
 						x2="0%"
 						y2="100%"
 					>
-						<stop offset="0%" stopColor="#688cb8" stopOpacity="0.2" />
-						<stop offset="40%" stopColor="#3d689e" stopOpacity="0.15" />
-						<stop offset="100%" stopColor="#142647" stopOpacity="0.02" />
+						<stop offset="0%" stopColor="#3b5677" stopOpacity="0.18" />
+						<stop offset="40%" stopColor="#264366" stopOpacity="0.12" />
+						<stop offset="100%" stopColor="#0d1a30" stopOpacity="0.02" />
 					</linearGradient>
 				</defs>
 
@@ -198,7 +198,7 @@ export function BackgroundSVG() {
 					width="100%"
 					height="100%"
 					filter="url(#marble-grain)"
-					style={{ mixBlendMode: 'overlay', opacity: 0.7 }}
+					style={{ mixBlendMode: 'overlay', opacity: 0.85 }}
 				/>
 
 				{/* 5. Soft Ambient Vignette for Reading Comfort */}
