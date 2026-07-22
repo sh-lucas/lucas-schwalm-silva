@@ -1,8 +1,8 @@
 /* Theme Variables */
 :root {
 	--bg-primary: #080e1a;
-	--bg-secondary: rgba(14, 23, 42, 0.82);
-	--bg-tertiary: rgba(20, 34, 60, 0.55);
+	--bg-secondary: rgba(14, 23, 42, 0.72);
+	--bg-tertiary: rgba(20, 34, 60, 0.45);
 	--border-color: rgba(255, 255, 255, 0.08);
 	--border-hover: rgba(91, 110, 225, 0.3);
 
@@ -150,6 +150,8 @@ body {
 	transition: var(--transition-smooth);
 	position: relative;
 	overflow: hidden;
+	backdrop-filter: blur(12px);
+	-webkit-backdrop-filter: blur(12px);
 }
 
 .glass-card:hover {
@@ -241,6 +243,8 @@ h4 {
 	margin-bottom: 1.5rem;
 	border: 1px solid var(--border-color);
 	gap: 0.15rem;
+	backdrop-filter: blur(8px);
+	-webkit-backdrop-filter: blur(8px);
 }
 
 .tab-btn {
@@ -295,6 +299,8 @@ h4 {
 	padding: 0.6rem 0.9rem;
 	border-radius: 10px;
 	transition: var(--transition-smooth);
+	backdrop-filter: blur(8px);
+	-webkit-backdrop-filter: blur(8px);
 }
 
 .tech-card:hover {
@@ -329,6 +335,8 @@ h4 {
 	text-decoration: none;
 	color: inherit;
 	display: block;
+	backdrop-filter: blur(8px);
+	-webkit-backdrop-filter: blur(8px);
 }
 
 .project-item:hover {
@@ -487,6 +495,8 @@ h4 {
 	padding: 1.1rem 1.25rem;
 	position: relative;
 	transition: border-color 0.2s ease;
+	backdrop-filter: blur(8px);
+	-webkit-backdrop-filter: blur(8px);
 }
 
 .metric-card.update-flash {
