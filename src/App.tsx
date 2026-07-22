@@ -101,6 +101,16 @@ const PRODUCTION_EXCUSES = [
 	'You are absolutely right! ...',
 ]
 
+const getUptimeComment = (uptime: number) => {
+	if (uptime > 95) {
+		return 'Perfect uptime. Totally trustworthy'
+	}
+	if (uptime > 50) {
+		return 'Some usual stuff is going on'
+	}
+	return 'Well... At least the statistics are working'
+}
+
 export function App() {
 	const navigate = useNavigate()
 	const { pathname } = useLocation()
@@ -126,7 +136,7 @@ export function App() {
 		'sse' | 'polling' | 'connecting'
 	>('connecting')
 	const [lastUpdated, setLastUpdated] = useState<Date>(new Date())
-	const [updateFlash, setUpdateFlash] = useState(false)
+	const [clusterUptime, setClusterUptime] = useState<number | null>(null)
 
 	// Excuse Generator state
 	const [productionExcuse, setProductionExcuse] = useState<string>(
@@ -151,8 +161,9 @@ export function App() {
 	const applyMetrics = (data: SystemMetrics) => {
 		setMetrics(data)
 		setLastUpdated(new Date())
-		setUpdateFlash(true)
-		setTimeout(() => setUpdateFlash(false), 300)
+		if (data.uptime_percent !== undefined && data.uptime_percent > 0) {
+			setClusterUptime((prev) => (prev === null ? data.uptime_percent : prev))
+		}
 	}
 
 	useEffect(() => {
@@ -232,10 +243,26 @@ export function App() {
 
 		connectSSE()
 
+		// 3. Refresh uptime statistic every 5 minutes (since backend calculates uptime on a 5m window)
+		const uptimeInterval = setInterval(async () => {
+			try {
+				const res = await fetch('https://checkup.sh-lucas.dev/api/metrics')
+				if (res.ok) {
+					const data = await res.json()
+					if (data.uptime_percent !== undefined && data.uptime_percent > 0) {
+						setClusterUptime(data.uptime_percent)
+					}
+				}
+			} catch (e) {
+				console.warn('5m uptime refresh failed', e)
+			}
+		}, 5 * 60 * 1000)
+
 		return () => {
 			if (eventSource) eventSource.close()
 			if (pollingInterval) clearInterval(pollingInterval)
 			if (reconnectTimeout) clearTimeout(reconnectTimeout)
+			if (uptimeInterval) clearInterval(uptimeInterval)
 		}
 	}, [])
 
@@ -714,47 +741,62 @@ export function App() {
 									gap: '1.5rem',
 								}}
 							>
-								{/* Dashboard Sub-Header */}
-								<div style={{ padding: '0 0.25rem', marginBottom: '1.25rem' }}>
-									<h2
-										style={{
-											fontSize: '1.5rem',
-											color: 'var(--text-main)',
-											fontWeight: 600,
-										}}
-									>
-										Live Node Monitor
-									</h2>
-									<p
-										style={{
-											color: 'var(--text-muted)',
-											fontSize: '0.82rem',
-											marginTop: '0.2rem',
-										}}
-									>
-										Self-hosted k3s single-node cluster - Last sync:{' '}
-										{lastUpdated.toLocaleTimeString()}
-									</p>
-								</div>
-
-								{/* Panic banner alerts (dispara apenas com load de servidor crítico) */}
-								{/* {metrics.load_avg >= 8.0 && (
-									<div className="panic-banner">
-										<div className="panic-title">
-											<AlertTriangle size={18} className="glow-text" />
-											<span>LOAD THRESHOLD WARNING: SYSTEM OVERSTRESSED</span>
+								{/* Kubernetes Cluster Card */}
+								<div className="k8s-cluster-banner">
+									{/* Cluster Title Header */}
+									<div className="k8s-banner-header">
+										<div>
+											<h3 className="k8s-cluster-title">Self-hosted k3s cluster</h3>
+											<p className="k8s-cluster-subtitle">
+												Last sync: {lastUpdated.toLocaleTimeString()}
+											</p>
 										</div>
-										<span
-											style={{
-												fontSize: '0.8rem',
-												opacity: 0.8,
-												fontFamily: 'monospace',
-											}}
-										>
-											Load: {metrics.load_avg.toFixed(2)}
-										</span>
 									</div>
-								)} */}
+
+									{/* Main Highlighted Uptime Display (Primary Information) */}
+									<div className="k8s-main-uptime-section">
+										<div className="k8s-uptime-header-row">
+											{/* <span
+												className={`pulse-dot ${
+													streamStatus === 'sse'
+														? 'pulsing'
+														: streamStatus === 'polling'
+														? 'polling'
+														: 'disconnected'
+												}`}
+												title={
+													streamStatus === 'sse'
+														? 'SSE Stream Active'
+														: streamStatus === 'polling'
+														? 'REST Polling Active'
+														: 'Offline'
+												}
+											/> */}
+											<span className="k8s-uptime-label-title">Cluster Uptime this week</span>
+										</div>
+
+										<div className="k8s-uptime-value-row">
+											<div className="k8s-uptime-number-group">
+												<span className="k8s-uptime-value">
+													{clusterUptime !== null && clusterUptime > 0
+														? clusterUptime.toFixed(2)
+														: '100.00'}
+												</span>
+												<span className="k8s-uptime-unit">%</span>
+											</div>
+
+											<div className="k8s-uptime-subcomment">
+												&gt; ({getUptimeComment(clusterUptime !== null && clusterUptime > 0 ? clusterUptime : 100.0)})
+											</div>
+										</div>
+									</div>
+
+									{/* Excuse Generator placed inside cluster card directly below Uptime */}
+									<ExcuseGenerator
+										excuse={productionExcuse}
+										onRoll={rollExcuse}
+									/>
+								</div>
 
 								{/* Metrics Grid */}
 								<div className="metrics-grid">
@@ -765,7 +807,6 @@ export function App() {
 										unit="%"
 										percent={metrics.cpu_percent}
 										barColor="var(--accent-primary)"
-										updateFlash={updateFlash}
 										description="Current CPU usage across the 2 (exclusive) virtual cores."
 									/>
 									<MetricCard
@@ -780,7 +821,6 @@ export function App() {
 										unit="%"
 										percent={metrics.memory_percent}
 										barColor="var(--accent-cyan)"
-										updateFlash={updateFlash}
 										description="Cache-free RAM usage across all running services out of 12 GB."
 									/>
 									<MetricCard
@@ -795,7 +835,6 @@ export function App() {
 										unit="GB"
 										percent={metrics.disk_percent}
 										barColor="var(--accent-emerald)"
-										updateFlash={updateFlash}
 										description="Used disk space on the 150 GB NVMe."
 									/>
 									<MetricCard
@@ -814,7 +853,6 @@ export function App() {
 												: 70 + (((metrics.avg_psi ?? 0) - 20) / 80) * 30
 										}
 										barColor="var(--accent-amber)"
-										updateFlash={updateFlash}
 										description="Average resource pressure. Ranges 0-100% but 20%+ is already resource starvation."
 										ticks={[
 											{ percent: 70, label: '20%' },
@@ -822,11 +860,6 @@ export function App() {
 										]}
 									/>
 								</div>
-
-								<ExcuseGenerator
-									excuse={productionExcuse}
-									onRoll={rollExcuse}
-								/>
 							</div>
 						)}
 					</main>
@@ -839,14 +872,6 @@ export function App() {
 					<span>
 						Made with lots of coffee by Lucas Silva © {new Date().getFullYear()}
 					</span>
-					<div className="footer-sep" />
-					<a
-						href="https://github.com/sh-lucas/lucas-schwalm-silva"
-						target="_blank"
-						rel="noopener noreferrer"
-					>
-						Source Code <ExternalLink size={11} />
-					</a>
 				</footer>
 			</div>
 		</>

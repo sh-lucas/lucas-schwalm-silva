@@ -7,7 +7,7 @@ interface MetricCardProps {
   unit: string
   percent: number
   barColor: string
-  updateFlash: boolean
+  updateFlash?: boolean
   description: string
   ticks?: { percent: number; label: string }[]
 }
@@ -19,12 +19,11 @@ export function MetricCard({
   unit,
   percent,
   barColor,
-  updateFlash,
   description,
   ticks
 }: MetricCardProps) {
   return (
-    <div className={`metric-card ${updateFlash ? 'update-flash' : ''}`}>
+    <div className="metric-card">
       <div className="metric-header">
         <div className="metric-title-group">
           {icon}
