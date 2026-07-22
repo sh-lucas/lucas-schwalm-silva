@@ -786,7 +786,7 @@ export function App() {
 											</div>
 
 											<div className="k8s-uptime-subcomment">
-												&gt; ({getUptimeComment(clusterUptime !== null && clusterUptime > 0 ? clusterUptime : 100.0)})
+												({getUptimeComment(clusterUptime !== null && clusterUptime > 0 ? clusterUptime : 100.0)})
 											</div>
 										</div>
 									</div>
