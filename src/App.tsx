@@ -331,7 +331,7 @@ export function App() {
 										marginTop: '0.35rem',
 									}}
 								>
-									Currently coding production-ready bugs at{' '}
+									Currently building production systems at {' '}
 									<a
 										href="https://roxcode.io/"
 										target="_blank"
@@ -344,7 +344,7 @@ export function App() {
 									>
 										Roxcode
 									</a>
-									.
+									, bugs included.
 								</p>
 							</div>
 
@@ -740,125 +740,119 @@ export function App() {
 									gap: '1.5rem',
 								}}
 							>
-								{/* Kubernetes Cluster Card */}
-								<div className="k8s-cluster-banner">
-									{/* Cluster Title Header */}
-									<div className="k8s-banner-header">
-										<div>
-											<h3 className="k8s-cluster-title">Self-hosted k3s cluster</h3>
-											<p className="k8s-cluster-subtitle">
-												Last sync: {lastUpdated.toLocaleTimeString()}
-											</p>
-										</div>
-									</div>
+								{/* Kubernetes Cluster Section */}
+								<section className="k8s-cluster-section">
+									<h3 className="k8s-cluster-title">Self-hosted k3s cluster</h3>
 
-									{/* Main Highlighted Uptime Display (Primary Information) */}
-									<div className="k8s-main-uptime-section">
-										<div className="k8s-uptime-header-row">
-											{/* <span
-												className={`pulse-dot ${
-													streamStatus === 'sse'
-														? 'pulsing'
-														: streamStatus === 'polling'
-														? 'polling'
-														: 'disconnected'
-												}`}
-												title={
-													streamStatus === 'sse'
-														? 'SSE Stream Active'
-														: streamStatus === 'polling'
-														? 'REST Polling Active'
-														: 'Offline'
-												}
-											/> */}
-											<span className="k8s-uptime-label-title">Cluster Uptime this week</span>
-										</div>
+									<div className="k8s-cluster-banner">
+										{/* Main Highlighted Uptime Display (Primary Information) */}
+										<div className="k8s-main-uptime-section">
+											<div className="k8s-uptime-value-row">
+												<div className="k8s-uptime-summary-row">
+													<div className="k8s-uptime-number-group">
+														<span className="k8s-uptime-value">
+															{clusterUptime !== null && clusterUptime > 0
+																? clusterUptime.toFixed(2)
+																: '100.00'}
+														</span>
+														<span className="k8s-uptime-unit">%</span>
+													</div>
+													<span className="k8s-uptime-label-title">
+														Cluster Uptime this week
+													</span>
+												</div>
 
-										<div className="k8s-uptime-value-row">
-											<div className="k8s-uptime-number-group">
-												<span className="k8s-uptime-value">
-													{clusterUptime !== null && clusterUptime > 0
-														? clusterUptime.toFixed(2)
-														: '100.00'}
-												</span>
-												<span className="k8s-uptime-unit">%</span>
-											</div>
-
-											<div className="k8s-uptime-subcomment">
-												({getUptimeComment(clusterUptime !== null && clusterUptime > 0 ? clusterUptime : 100.0)})
+												<div className="k8s-uptime-subcomment">
+													({getUptimeComment(clusterUptime !== null && clusterUptime > 0 ? clusterUptime : 100.0)})
+												</div>
 											</div>
 										</div>
+
+										{/* Excuse Generator placed directly below Uptime */}
+										<ExcuseGenerator
+											excuse={productionExcuse}
+											onRoll={rollExcuse}
+											style={{
+												background: 'transparent',
+												border: 'none',
+												borderRadius: 0,
+												padding: 0,
+												marginBottom: 0,
+											}}
+										/>
 									</div>
+								</section>
 
-									{/* Excuse Generator placed inside cluster card directly below Uptime */}
-									<ExcuseGenerator
-										excuse={productionExcuse}
-										onRoll={rollExcuse}
-									/>
-								</div>
-
-								{/* Metrics Grid */}
-								<div className="metrics-grid">
-									<MetricCard
-										icon={<Cpu className="metric-icon" />}
-										label="Hamster Wheel Speed (CPU %)"
-										value={metrics.cpu_percent.toFixed(1)}
-										unit="%"
-										percent={metrics.cpu_percent}
-										barColor="var(--accent-primary)"
-										description="Current CPU usage across the 2 (exclusive) virtual cores."
-									/>
-									<MetricCard
-										icon={
-											<Activity
-												className="metric-icon"
-												style={{ color: 'var(--accent-cyan)' }}
-											/>
-										}
-										label="Thermos Bottle Level (RAM)"
-										value={metrics.memory_percent.toFixed(1)}
-										unit="%"
-										percent={metrics.memory_percent}
-										barColor="var(--accent-cyan)"
-										description="Cache-free RAM usage across all running services out of 12 GB."
-									/>
-									<MetricCard
-										icon={
-											<HardDrive
-												className="metric-icon"
-												style={{ color: 'var(--accent-emerald)' }}
-											/>
-										}
-										label="Kitten memes folder size (disk)"
-										value={((metrics.disk_percent / 100) * 150).toFixed(1)}
-										unit="GB"
-										percent={metrics.disk_percent}
-										barColor="var(--accent-emerald)"
-										description="Used disk space on the 150 GB NVMe."
-									/>
-									<MetricCard
-										icon={
-											<Coffee
-												className="metric-icon"
-												style={{ color: 'var(--accent-amber)' }}
-											/>
-										}
-										label="Coffees needed (PSI %)"
-										value={metrics.avg_psi}
-										unit="cups"
-										percent={
-											(metrics.avg_psi ?? 0) <= 20
-												? ((metrics.avg_psi ?? 0) / 20) * 70
-												: 70 + (((metrics.avg_psi ?? 0) - 20) / 80) * 30
-										}
-										barColor="var(--accent-amber)"
-										description="Average resource pressure. Ranges 0-100% but 20%+ is already resource starvation."
-										ticks={[
-											{ percent: 70, label: '20%' },
-											{ percent: 100, label: '100%' },
-										]}
-									/>
-								</div>
+								{/* Metrics Section */}
+								<section className="live-metrics-section">
+									<div className="live-metrics-header">
+										<h3 className="live-metrics-title">Live System Metrics</h3>
+										<p className="live-metrics-updated">
+											Last updated at {lastUpdated.toLocaleTimeString()}
+										</p>
+									</div>
+									<div className="metrics-grid">
+										<MetricCard
+											icon={<Cpu className="metric-icon" />}
+											label="Hamster Wheel Speed (CPU %)"
+											value={metrics.cpu_percent.toFixed(1)}
+											unit="%"
+											percent={metrics.cpu_percent}
+											barColor="var(--accent-primary)"
+											description="Current CPU usage across the 2 (exclusive) virtual cores."
+										/>
+										<MetricCard
+											icon={
+												<Activity
+													className="metric-icon"
+													style={{ color: 'var(--accent-cyan)' }}
+												/>
+											}
+											label="Thermos Bottle Level (RAM)"
+											value={metrics.memory_percent.toFixed(1)}
+											unit="%"
+											percent={metrics.memory_percent}
+											barColor="var(--accent-cyan)"
+											description="Cache-free RAM usage across all running services out of 12 GB."
+										/>
+										<MetricCard
+											icon={
+												<HardDrive
+													className="metric-icon"
+													style={{ color: 'var(--accent-emerald)' }}
+												/>
+											}
+											label="Kitten memes folder size (disk)"
+											value={((metrics.disk_percent / 100) * 150).toFixed(1)}
+											unit="GB"
+											percent={metrics.disk_percent}
+											barColor="var(--accent-emerald)"
+											description="Used disk space on the 150 GB NVMe."
+										/>
+										<MetricCard
+											icon={
+												<Coffee
+													className="metric-icon"
+													style={{ color: 'var(--accent-amber)' }}
+												/>
+											}
+											label="Coffees needed (PSI %)"
+											value={metrics.avg_psi}
+											unit="cups"
+											percent={
+												(metrics.avg_psi ?? 0) <= 20
+													? ((metrics.avg_psi ?? 0) / 20) * 70
+													: 70 + (((metrics.avg_psi ?? 0) - 20) / 80) * 30
+											}
+											barColor="var(--accent-amber)"
+											description="Average resource pressure. Ranges 0-100% but 20%+ is already resource starvation."
+											ticks={[
+												{ percent: 70, label: '20%' },
+												{ percent: 100, label: '100%' },
+											]}
+										/>
+									</div>
+								</section>
 							</div>
 						)}
 					</main>
