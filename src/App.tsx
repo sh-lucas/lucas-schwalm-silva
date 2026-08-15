@@ -40,6 +40,40 @@ const TAB_TO_ROUTE: Record<string, string> = {
 	Projects: '/projects',
 }
 
+const EXPERIENCES = [
+	{
+		company: 'Roxcode',
+		role: 'Full Stack Developer',
+		link: 'https://roxcode.io/',
+		highlights: [
+			'Backend development and integrations for reward programs in the Internacional Shopping and Nectar Market mobile apps.',
+			"Maintenance and development for Frigelar's mobile app and CRM.",
+			'RAG pipelines, image processing, and text extraction with embedded AI (TFLite) and cloud AI (Vertex AI).',
+		],
+		techs: ['Microservices', 'Golang', 'NestJS', 'SQL', 'MongoDB'],
+	},
+	{
+		company: 'Metria Sales',
+		role: 'Freelance Full Stack Developer',
+		link: 'https://metriasales.com/',
+		highlights: [
+			'Full-stack web and backend development for sales CRM.',
+			'AI integrations, data processing, and classification pipelines.',
+		],
+		techs: ['Node.js', 'MySQL', 'React'],
+	},
+	{
+		company: 'Fascode',
+		role: 'Collaboration & Consulting',
+		link: 'https://www.fascode.com.br/',
+		highlights: [
+			'Development of internal core products as well as custom client solutions.',
+			'Infrastructure architecture and maintenance across distributed projects.',
+		],
+		techs: ['Spring Boot', 'SQLite', 'React'],
+	},
+]
+
 const PROJECTS = [
 	{
 		name: 'lucas-schwalm-silva',
@@ -322,7 +356,7 @@ export function App() {
 									>
 										UERGS
 									</span>
-									, looking for experience and self development.
+									, building software that fits.
 								</p>
 								<p
 									style={{
@@ -331,7 +365,7 @@ export function App() {
 										marginTop: '0.35rem',
 									}}
 								>
-									Currently building production systems at {' '}
+									Currently coding at {' '}
 									<a
 										href="https://roxcode.io/"
 										target="_blank"
@@ -344,7 +378,7 @@ export function App() {
 									>
 										Roxcode
 									</a>
-									, bugs included.
+									.
 								</p>
 							</div>
 
@@ -408,75 +442,91 @@ export function App() {
 									gap: '1.5rem',
 								}}
 							>
-								{/* Roxcode */}
-								<div>
+								{EXPERIENCES.map((exp, index) => (
 									<div
-										style={{
-											display: 'flex',
-											justifyContent: 'space-between',
-											alignItems: 'baseline',
-										}}
+										key={exp.company}
+										style={
+											index > 0
+												? {
+														borderTop: '1px solid var(--border-color)',
+														paddingTop: '1.25rem',
+													}
+												: undefined
+										}
 									>
-										<h3
+										<div
 											style={{
-												fontSize: '1.1rem',
-												color: 'var(--text-main)',
-												fontWeight: 600,
+												display: 'flex',
+												justifyContent: 'space-between',
+												alignItems: 'baseline',
+												flexWrap: 'wrap',
+												gap: '0.25rem',
 											}}
 										>
-											Full Stack Engineer
-										</h3>
-										<span
+											<h3
+												style={{
+													fontSize: '1.05rem',
+													color: 'var(--text-main)',
+													fontWeight: 600,
+												}}
+											>
+												{exp.role}
+											</h3>
+											{exp.link ? (
+												<a
+													href={exp.link}
+													target="_blank"
+													rel="noopener noreferrer"
+													style={{
+														fontSize: '0.88rem',
+														color: 'var(--accent-cyan)',
+														fontWeight: 500,
+														textDecoration: 'none',
+													}}
+												>
+													@ {exp.company}
+												</a>
+											) : (
+												<span
+													style={{
+														fontSize: '0.88rem',
+														color: 'var(--accent-cyan)',
+														fontWeight: 500,
+													}}
+												>
+													@{exp.company}
+												</span>
+											)}
+										</div>
+
+										<ul
 											style={{
-												fontSize: '0.78rem',
+												margin: '0.6rem 0 0 1.15rem',
+												padding: 0,
+												display: 'flex',
+												flexDirection: 'column',
+												gap: '0.35rem',
 												color: 'var(--text-muted)',
-												fontFamily: 'var(--font-mono)',
+												fontSize: '0.85rem',
+												lineHeight: '1.55',
 											}}
 										>
-											2024 – present
-										</span>
-									</div>
-									<p
-										style={{
-											fontSize: '0.85rem',
-											color: 'var(--text-muted)',
-											marginTop: '0.15rem',
-										}}
-									>
-										<a
-											href="https://roxcode.io/"
-											target="_blank"
-											rel="noopener noreferrer"
+											{exp.highlights.map((item) => (
+												<li key={item} style={{ paddingLeft: '0.15rem' }}>
+													{item}
+												</li>
+											))}
+										</ul>
+
+										<div
 											style={{
-												color: 'var(--accent-cyan)',
-												textDecoration: 'none',
+												display: 'flex',
+												flexWrap: 'wrap',
+												gap: '0.4rem',
+												marginTop: '0.75rem',
 											}}
 										>
-											Roxcode
-										</a>{' '}
-										· Remote (Brazil)
-									</p>
-									<p
-										style={{
-											fontSize: '0.85rem',
-											color: 'var(--text-muted)',
-											marginTop: '0.6rem',
-											lineHeight: '1.55',
-										}}
-									>
-										Web development, NodeJS and React maintenance, Golang and
-										microservices architecture.
-									</p>
-									<div
-										style={{
-											display: 'flex',
-											flexWrap: 'wrap',
-											gap: '0.4rem',
-											marginTop: '0.75rem',
-										}}
-									>
-										{['Go', 'MongoDB', 'TypeScript', 'RabbitMQ', 'SQL'].map(
-											(t) => (
+											{exp.techs.map((t) => (
 												<span
 													key={t}
 													style={{
@@ -491,211 +541,10 @@ export function App() {
 												>
 													{t}
 												</span>
-											),
-										)}
-									</div>
-								</div>
-
-								{/* UERGS */}
-								<div
-									style={{
-										borderTop: '1px solid var(--border-color)',
-										paddingTop: '1.25rem',
-									}}
-								>
-									<div
-										style={{
-											display: 'flex',
-											justifyContent: 'space-between',
-											alignItems: 'baseline',
-										}}
-									>
-										<h3
-											style={{
-												fontSize: '1.1rem',
-												color: 'var(--text-main)',
-												fontWeight: 600,
-											}}
-										>
-											Computer Engineering
-										</h3>
-										<span
-											style={{
-												fontSize: '0.78rem',
-												color: 'var(--text-muted)',
-												fontFamily: 'var(--font-mono)',
-											}}
-										>
-											2023 – 2027
-										</span>
-									</div>
-									<p
-										style={{
-											fontSize: '0.85rem',
-											color: 'var(--text-muted)',
-											marginTop: '0.15rem',
-										}}
-									>
-										UERGS · Porto Alegre, Brazil
-									</p>
-									<p
-										style={{
-											fontSize: '0.85rem',
-											color: 'var(--text-muted)',
-											marginTop: '0.6rem',
-											lineHeight: '1.55',
-										}}
-									>
-										Hardware architecture, Parallel computing, Low-level
-										programming. Strong math foundation.
-									</p>
-									<div
-										style={{
-											display: 'flex',
-											flexWrap: 'wrap',
-											gap: '0.4rem',
-											marginTop: '0.75rem',
-										}}
-									>
-										{['C', 'Mathematics', 'Parallel Computing'].map((t) => (
-											<span
-												key={t}
-												style={{
-													fontFamily: 'var(--font-mono)',
-													fontSize: '0.72rem',
-													color: 'var(--text-muted)',
-													background: 'rgba(255,255,255,0.05)',
-													padding: '0.15rem 0.5rem',
-													borderRadius: '4px',
-													border: '1px solid var(--border-color)',
-												}}
-											>
-												{t}
-											</span>
-										))}
-									</div>
-								</div>
-
-								{/* Minor experiences */}
-								<div
-									style={{
-										borderTop: '1px solid var(--border-color)',
-										paddingTop: '1.25rem',
-									}}
-								>
-									<h4
-										style={{
-											fontSize: '0.75rem',
-											color: 'var(--text-dark)',
-											textTransform: 'uppercase',
-											letterSpacing: '0.06em',
-											marginBottom: '1rem',
-										}}
-									>
-										Minor experiences
-									</h4>
-									<div
-										style={{
-											display: 'flex',
-											flexDirection: 'column',
-											gap: '0.9rem',
-										}}
-									>
-										<div>
-											<p
-												style={{
-													fontSize: '0.9rem',
-													color: 'var(--text-main)',
-													fontWeight: 500,
-												}}
-											>
-												Dumbly self-hosting k3s
-											</p>
-											<p
-												style={{
-													fontSize: '0.82rem',
-													color: 'var(--text-muted)',
-													marginTop: '0.2rem',
-													lineHeight: '1.5',
-												}}
-											>
-												Running a personal Kubernetes cluster on a Virtual Machine. Docker/Podman, GitOps, Cloudflare and Networking.
-											</p>
-											<div
-												style={{
-													display: 'flex',
-													flexWrap: 'wrap',
-													gap: '0.4rem',
-													marginTop: '0.5rem',
-												}}
-											>
-												{['Podman', 'Linux', 'k3s'].map((t) => (
-													<span
-														key={t}
-														style={{
-															fontFamily: 'var(--font-mono)',
-															fontSize: '0.72rem',
-															color: 'var(--text-muted)',
-															background: 'rgba(255,255,255,0.05)',
-															padding: '0.15rem 0.5rem',
-															borderRadius: '4px',
-															border: '1px solid var(--border-color)',
-														}}
-													>
-														{t}
-													</span>
-												))}
-											</div>
-										</div>
-										<div>
-											<p
-												style={{
-													fontSize: '0.9rem',
-													color: 'var(--text-main)',
-													fontWeight: 500,
-												}}
-											>
-												checkup — Live monitor's API
-											</p>
-											<p
-												style={{
-													fontSize: '0.82rem',
-													color: 'var(--text-muted)',
-													marginTop: '0.2rem',
-													lineHeight: '1.5',
-												}}
-											>
-												Real-time system health endpoint powering this
-												dashboard. SSE streaming, REST fallback.
-											</p>
-											<div
-												style={{
-													display: 'flex',
-													flexWrap: 'wrap',
-													gap: '0.4rem',
-													marginTop: '0.5rem',
-												}}
-											>
-												{['Rust', 'SQLite'].map((t) => (
-													<span
-														key={t}
-														style={{
-															fontFamily: 'var(--font-mono)',
-															fontSize: '0.72rem',
-															color: 'var(--text-muted)',
-															background: 'rgba(255,255,255,0.05)',
-															padding: '0.15rem 0.5rem',
-															borderRadius: '4px',
-															border: '1px solid var(--border-color)',
-														}}
-													>
-														{t}
-													</span>
-												))}
-											</div>
+											))}
 										</div>
 									</div>
-								</div>
+								))}
 							</div>
 						)}
 
