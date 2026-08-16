@@ -82,10 +82,10 @@ const PROJECTS = [
 		desc: 'This very website. A portfolio and live server dashboard built with React and Vite.',
 	},
 	{
-		name: 'Teapot',
-		link: 'https://github.com/sh-lucas/teapot',
-		techs: 'Go, WebSockets, HTML',
-		desc: "Stream your Docker container's stdout/stderr live to a clean web console. Minimalist and simple.",
+		name: 'Plinth',
+		link: 'https://plinth.sh-lucas.dev/redoc',
+		techs: 'Web API',
+		desc: 'A multi-tenant ledger for managing any quantity, built to be auditable, reliable, and extensively configurable.',
 	},
 	{
 		name: 'libsql-handler',
@@ -94,10 +94,10 @@ const PROJECTS = [
 		desc: 'A pure Go implementation of the libSQL Hrana protocol to query remote databases directly without needing sqld.',
 	},
 	{
-		name: 'GoProxy',
-		link: 'https://github.com/sh-lucas/goproxy',
-		techs: 'Go, YAML',
-		desc: 'Reverse proxy that redirects prefix routes to upstream hosts. Configurable via YAML, when caddy is overkill.',
+		name: 'Teapot',
+		link: 'https://github.com/sh-lucas/teapot',
+		techs: 'Go, WebSockets',
+		desc: "Stream your Docker container's stdout/stderr live to a clean web console. Minimalist and simple.",
 	},
 ]
 
