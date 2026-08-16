@@ -170,10 +170,6 @@ body {
 	-webkit-backdrop-filter: blur(12px);
 }
 
-.glass-card:hover {
-	border-color: var(--border-hover);
-}
-
 /* Typography */
 h1,
 h2,
@@ -409,7 +405,6 @@ h4 {
 .project-item:hover {
 	border-color: var(--border-hover);
 	background: rgba(255, 255, 255, 0.02);
-	transform: translateX(0.125rem);
 }
 
 .project-header {
