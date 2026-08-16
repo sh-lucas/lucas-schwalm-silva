@@ -278,19 +278,22 @@ export function App() {
 		connectSSE()
 
 		// 3. Refresh uptime statistic every 5 minutes (since backend calculates uptime on a 5m window)
-		const uptimeInterval = setInterval(async () => {
-			try {
-				const res = await fetch('https://checkup.sh-lucas.dev/api/metrics')
-				if (res.ok) {
-					const data = await res.json()
-					if (data.uptime_percent !== undefined && data.uptime_percent > 0) {
-						setClusterUptime(data.uptime_percent)
+		const uptimeInterval = setInterval(
+			async () => {
+				try {
+					const res = await fetch('https://checkup.sh-lucas.dev/api/metrics')
+					if (res.ok) {
+						const data = await res.json()
+						if (data.uptime_percent !== undefined && data.uptime_percent > 0) {
+							setClusterUptime(data.uptime_percent)
+						}
 					}
+				} catch (e) {
+					console.warn('5m uptime refresh failed', e)
 				}
-			} catch (e) {
-				console.warn('5m uptime refresh failed', e)
-			}
-		}, 5 * 60 * 1000)
+			},
+			5 * 60 * 1000,
+		)
 
 		return () => {
 			if (eventSource) eventSource.close()
@@ -321,35 +324,19 @@ export function App() {
 								className={`pulse-indicator ${streamStatus === 'sse' ? 'active' : 'inactive'}`}
 							/>
 						</div>
-						<div className="profile-info" style={{ gap: '1rem' }}>
+						<div className="profile-info">
 							<div>
-								<h1
-									className="title-gradient"
-									style={{ fontSize: '2.8rem', lineHeight: '1.1' }}
-								>
+								<h1 className="profile-title title-gradient">
 									Hello, I am{' '}
 									<span style={{ textDecoration: 'underline' }}>Lucas</span>!
 								</h1>
-								<p
-									style={{
-										color: 'var(--text-muted)',
-										fontFamily: 'var(--font-mono)',
-										fontSize: '0.85rem',
-										marginTop: '0.4rem',
-									}}
-								>
+								<p className="profile-tag">
 									&lt;Computer Engineer / Full Stack&gt;
 								</p>
 							</div>
 
 							<div>
-								<p
-									style={{
-										color: 'var(--text-main)',
-										fontSize: '1rem',
-										lineHeight: '1.6',
-									}}
-								>
+								<p className="profile-bio">
 									{age} y/o student at{' '}
 									<span
 										style={{ color: 'var(--accent-primary)', fontWeight: 600 }}
@@ -358,14 +345,8 @@ export function App() {
 									</span>
 									, building software that fits.
 								</p>
-								<p
-									style={{
-										color: 'var(--text-muted)',
-										fontSize: '0.9rem',
-										marginTop: '0.35rem',
-									}}
-								>
-									Currently coding at {' '}
+								<p className="profile-current">
+									Currently coding at{' '}
 									<a
 										href="https://roxcode.io/"
 										target="_blank"
@@ -382,7 +363,7 @@ export function App() {
 								</p>
 							</div>
 
-							<div className="social-links" style={{ marginTop: '0.25rem' }}>
+							<div className="social-links">
 								<a
 									href="https://github.com/sh-lucas"
 									target="_blank"
@@ -412,18 +393,21 @@ export function App() {
 					{/* Tab Selection Switcher */}
 					<div className="tab-container">
 						<button
+							type="button"
 							className={`tab-btn ${tab === 'Live Monitor' ? 'active' : ''}`}
 							onClick={() => setTab('Live Monitor')}
 						>
 							Live Monitor
 						</button>
 						<button
+							type="button"
 							className={`tab-btn ${tab === 'Experience' ? 'active' : ''}`}
 							onClick={() => setTab('Experience')}
 						>
 							Experience
 						</button>
 						<button
+							type="button"
 							className={`tab-btn ${tab === 'Projects' ? 'active' : ''}`}
 							onClick={() => setTab('Projects')}
 						>
@@ -434,111 +418,36 @@ export function App() {
 					{/* Dynamic Tab Contents */}
 					<main className="info-content">
 						{tab === 'Experience' && (
-							<div
-								className="glass-card fade-in"
-								style={{
-									display: 'flex',
-									flexDirection: 'column',
-									gap: '1.5rem',
-								}}
-							>
-								{EXPERIENCES.map((exp, index) => (
-									<div
-										key={exp.company}
-										style={
-											index > 0
-												? {
-														borderTop: '1px solid var(--border-color)',
-														paddingTop: '1.25rem',
-													}
-												: undefined
-										}
-									>
-										<div
-											style={{
-												display: 'flex',
-												justifyContent: 'space-between',
-												alignItems: 'baseline',
-												flexWrap: 'wrap',
-												gap: '0.25rem',
-											}}
-										>
-											<h3
-												style={{
-													fontSize: '1.05rem',
-													color: 'var(--text-main)',
-													fontWeight: 600,
-												}}
-											>
-												{exp.role}
-											</h3>
+							<div className="glass-card fade-in experience-list">
+								{EXPERIENCES.map((exp) => (
+									<div key={exp.company} className="experience-item">
+										<div className="experience-header">
+											<h3 className="experience-role">{exp.role}</h3>
 											{exp.link ? (
 												<a
 													href={exp.link}
 													target="_blank"
 													rel="noopener noreferrer"
-													style={{
-														fontSize: '0.88rem',
-														color: 'var(--accent-cyan)',
-														fontWeight: 500,
-														textDecoration: 'none',
-													}}
+													className="experience-company"
 												>
 													@ {exp.company}
 												</a>
 											) : (
-												<span
-													style={{
-														fontSize: '0.88rem',
-														color: 'var(--accent-cyan)',
-														fontWeight: 500,
-													}}
-												>
+												<span className="experience-company">
 													@{exp.company}
 												</span>
 											)}
 										</div>
 
-										<ul
-											style={{
-												margin: '0.6rem 0 0 1.15rem',
-												padding: 0,
-												display: 'flex',
-												flexDirection: 'column',
-												gap: '0.35rem',
-												color: 'var(--text-muted)',
-												fontSize: '0.85rem',
-												lineHeight: '1.55',
-											}}
-										>
+										<ul className="experience-highlights">
 											{exp.highlights.map((item) => (
-												<li key={item} style={{ paddingLeft: '0.15rem' }}>
-													{item}
-												</li>
+												<li key={item}>{item}</li>
 											))}
 										</ul>
 
-										<div
-											style={{
-												display: 'flex',
-												flexWrap: 'wrap',
-												gap: '0.4rem',
-												marginTop: '0.75rem',
-											}}
-										>
+										<div className="experience-tags">
 											{exp.techs.map((t) => (
-												<span
-													key={t}
-													style={{
-														fontFamily: 'var(--font-mono)',
-														fontSize: '0.72rem',
-														color: 'var(--text-muted)',
-														background: 'rgba(255,255,255,0.05)',
-														padding: '0.15rem 0.5rem',
-														borderRadius: '4px',
-														border: '1px solid var(--border-color)',
-													}}
-												>
+												<span key={t} className="experience-tag">
 													{t}
 												</span>
 											))}
@@ -560,18 +469,9 @@ export function App() {
 									>
 										<div className="project-header">
 											<span className="project-name">{p.name}</span>
-											<div
-												style={{
-													display: 'flex',
-													alignItems: 'center',
-													gap: '0.5rem',
-												}}
-											>
+											<div className="project-tech-group">
 												<span className="project-tech">{p.techs}</span>
-												<ExternalLink
-													size={13}
-													style={{ color: 'var(--text-dark)', flexShrink: 0 }}
-												/>
+												<ExternalLink size={13} className="project-tech-icon" />
 											</div>
 										</div>
 										<p className="project-desc">{p.desc}</p>
@@ -612,7 +512,13 @@ export function App() {
 												</div>
 
 												<div className="k8s-uptime-subcomment">
-													({getUptimeComment(clusterUptime !== null && clusterUptime > 0 ? clusterUptime : 100.0)})
+													(
+													{getUptimeComment(
+														clusterUptime !== null && clusterUptime > 0
+															? clusterUptime
+															: 100.0,
+													)}
+													)
 												</div>
 											</div>
 										</div>
