@@ -83,7 +83,7 @@ const PROJECTS = [
 	},
 	{
 		name: 'Plinth',
-		link: 'https://plinth.sh-lucas.dev/redoc',
+		link: 'https://about.plinth.sh-lucas.dev',
 		techs: 'Web API',
 		desc: 'A multi-tenant ledger for managing any quantity, built to be auditable, reliable, and extensively configurable.',
 	},
