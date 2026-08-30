@@ -180,7 +180,9 @@ export function App() {
 
 				<footer className="site-footer">
 					<span>© {new Date().getFullYear()} Lucas Schwalm Silva</span>
-					<span className="footer-meta">React · Vite · self-hosted on k3s</span>
+					<span className="footer-meta">
+						React · Vite · hosted with Cloudflare and k3s
+					</span>
 				</footer>
 			</div>
 		</>

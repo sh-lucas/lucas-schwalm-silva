@@ -1,3 +1,5 @@
+import { ArrowUpRight } from 'lucide-react'
+
 import { EXPERIENCES } from '../data'
 
 export function ExperienceSection() {
@@ -20,6 +22,7 @@ export function ExperienceSection() {
 								className="experience-company"
 							>
 								@ {exp.company}
+								<ArrowUpRight size={12} className="company-link-icon" />
 							</a>
 						</div>
 

@@ -42,11 +42,21 @@ export const EXPERIENCES: Experience[] = [
 		role: 'Full Stack Developer',
 		link: 'https://roxcode.io/',
 		highlights: [
-			'Backend development and integrations for reward programs in the Internacional Shopping and Nectar Market mobile apps.',
-			"Maintenance and development for Frigelar's mobile app and CRM.",
+			'Backend development and integrations for multiple projects, including Frigelar, Internacional Shopping, and Nectar Applications.',
+			"Diverse use of NodeJS, Go, SQL and MongoDB for products that need from simplicity to distributed consistency.",
 			'RAG pipelines, image processing, and text extraction with embedded AI (TFLite) and cloud AI (Vertex AI).',
 		],
 		techs: ['Microservices', 'Golang', 'NestJS', 'SQL', 'MongoDB'],
+	},
+	{
+		company: 'Fascode',
+		role: 'Development, DevOps & Consulting',
+		link: 'https://www.fascode.com.br/',
+		highlights: [
+			'Development of internal core products as well as custom client solutions.',
+			'Infrastructure architecture and maintenance across distributed projects.',
+		],
+		techs: ['Spring Boot', 'Podman', 'React', 'CI/CD'],
 	},
 	{
 		company: 'Metria Sales',
@@ -56,17 +66,7 @@ export const EXPERIENCES: Experience[] = [
 			'Full-stack web and backend development for sales CRM.',
 			'AI integrations, data processing, and classification pipelines.',
 		],
-		techs: ['Node.js', 'MySQL', 'React'],
-	},
-	{
-		company: 'Fascode',
-		role: 'Collaboration & Consulting',
-		link: 'https://www.fascode.com.br/',
-		highlights: [
-			'Development of internal core products as well as custom client solutions.',
-			'Infrastructure architecture and maintenance across distributed projects.',
-		],
-		techs: ['Spring Boot', 'SQLite', 'React'],
+		techs: ['Node.js', 'MySQL', 'React', 'CI/CD'],
 	},
 ]
 
@@ -84,16 +84,16 @@ export const PROJECTS: Project[] = [
 		desc: 'A multi-tenant ledger for managing any quantity, built to be auditable, reliable, and extensively configurable.',
 	},
 	{
+		name: 'checkup',
+		link: 'https://github.com/sh-lucas/checkup',
+		techs: ['Rust'],
+		desc: 'Small system monitor and uptime calculator — the backend streaming live metrics to this very dashboard.',
+	},
+	{
 		name: 'libsql-handler',
 		link: 'https://github.com/sh-lucas/libsql-handler',
 		techs: ['Go'],
 		desc: 'A pure Go implementation of the libSQL Hrana protocol to query remote databases directly without needing sqld.',
-	},
-	{
-		name: 'Teapot',
-		link: 'https://github.com/sh-lucas/teapot',
-		techs: ['Go', 'WebSockets'],
-		desc: "Stream your Docker container's stdout/stderr live to a clean web console. Minimalist and simple.",
 	},
 ]
 

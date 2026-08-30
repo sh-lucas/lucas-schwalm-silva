@@ -25,6 +25,7 @@
 
 .experience-item {
 	position: relative;
+	margin-top: 1.2rem;
 }
 
 .experience-item::before {
@@ -55,6 +56,9 @@
 }
 
 .experience-company {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.2rem;
 	font-family: var(--font-mono);
 	font-size: 0.8125rem;
 	font-weight: 500;
@@ -65,6 +69,19 @@
 
 .experience-company:hover {
 	color: var(--text-primary);
+}
+
+.company-link-icon {
+	width: 0.75rem;
+	height: 0.75rem;
+	color: var(--text-tertiary);
+	flex-shrink: 0;
+	transition: color var(--transition-fast), transform var(--transition-fast);
+}
+
+.experience-company:hover .company-link-icon {
+	color: var(--text-primary);
+	transform: translate(1px, -1px);
 }
 
 .experience-highlights {
