@@ -8,10 +8,9 @@ import {
 	Linkedin,
 	Mail,
 } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { Navigate, useLocation, useNavigate } from 'react-router-dom'
 
-import { BackgroundSVG } from './components/BackgroundSVG'
 import { ExcuseGenerator } from './components/ExcuseGenerator'
 // Component imports
 import { MetricCard } from './components/MetricCard'
@@ -192,13 +191,13 @@ export function App() {
 	}
 
 	// --- Metrics fetching: polling as primary, SSE as upgrade ---
-	const applyMetrics = (data: SystemMetrics) => {
+	const applyMetrics = useCallback((data: SystemMetrics) => {
 		setMetrics(data)
 		setLastUpdated(new Date())
 		if (data.uptime_percent !== undefined && data.uptime_percent > 0) {
 			setClusterUptime((prev) => (prev === null ? data.uptime_percent : prev))
 		}
-	}
+	}, [])
 
 	useEffect(() => {
 		let pollingInterval: ReturnType<typeof setInterval> | null = null
@@ -301,12 +300,10 @@ export function App() {
 			if (reconnectTimeout) clearTimeout(reconnectTimeout)
 			if (uptimeInterval) clearInterval(uptimeInterval)
 		}
-	}, [])
+	}, [applyMetrics])
 
 	return (
 		<>
-			{/* Dark Navy Marble Stain SVG Background */}
-			<BackgroundSVG />
 			{/* Redirect / → /metrics */}
 			{pathname === '/' && <Navigate to="/metrics" replace />}
 			<div className="app-wrapper">
@@ -326,24 +323,18 @@ export function App() {
 						</div>
 						<div className="profile-info">
 							<div>
-								<h1 className="profile-title title-gradient">
-									Hello, I am{' '}
-									<span style={{ textDecoration: 'underline' }}>Lucas</span>!
-								</h1>
+								<p className="profile-kicker">Porto Alegre, Brazil</p>
+								<h1 className="profile-title">Lucas Schwalm Silva</h1>
 								<p className="profile-tag">
-									&lt;Computer Engineer / Full Stack&gt;
+									Computer Engineer & Full-stack Developer
 								</p>
 							</div>
 
 							<div>
 								<p className="profile-bio">
 									{age} y/o student at{' '}
-									<span
-										style={{ color: 'var(--accent-primary)', fontWeight: 600 }}
-									>
-										UERGS
-									</span>
-									, building software that fits.
+									<span className="inline-accent">UERGS</span>, building
+									software that fits.
 								</p>
 								<p className="profile-current">
 									Currently coding at{' '}
@@ -351,11 +342,7 @@ export function App() {
 										href="https://roxcode.io/"
 										target="_blank"
 										rel="noopener noreferrer"
-										style={{
-											color: 'var(--accent-cyan)',
-											fontWeight: 500,
-											textDecoration: 'none',
-										}}
+										className="inline-link"
 									>
 										Roxcode
 									</a>
@@ -397,7 +384,7 @@ export function App() {
 							className={`tab-btn ${tab === 'Live Monitor' ? 'active' : ''}`}
 							onClick={() => setTab('Live Monitor')}
 						>
-							Live Monitor
+							Monitor
 						</button>
 						<button
 							type="button"

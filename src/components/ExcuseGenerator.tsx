@@ -22,7 +22,7 @@ export function ExcuseGenerator({
 		>
 			<div className="excuse-header">
 				<div className="excuse-header-info">
-					<h4 className="excuse-title">🤷‍♂️ Excuse Generator</h4>
+					<h4 className="excuse-title">Production excuse</h4>
 					<p className="excuse-subtitle">
 						Pull a production-ready excuse out of thin air
 					</p>
@@ -32,7 +32,7 @@ export function ExcuseGenerator({
 					className="generator-btn excuse-roll-btn"
 					type="button"
 				>
-					<RefreshCw size={14} /> Roll Excuse
+					<RefreshCw size={14} /> Generate
 				</button>
 			</div>
 			<p className="excuse-quote">"{excuse}"</p>

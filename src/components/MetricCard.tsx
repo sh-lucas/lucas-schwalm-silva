@@ -1,4 +1,4 @@
-import React from 'react'
+import type React from 'react'
 
 interface MetricCardProps {
 	icon: React.ReactNode
@@ -46,7 +46,7 @@ export function MetricCard({
 				</div>
 				{ticks && ticks.length > 0 && (
 					<div className="metric-ticks-container">
-						{ticks.map((tick, i) => {
+						{ticks.map((tick) => {
 							const isStart = tick.percent <= 5
 							const isEnd = tick.percent >= 95
 							const align = isStart ? 'left' : isEnd ? 'right' : 'center'
@@ -59,7 +59,7 @@ export function MetricCard({
 
 							return (
 								<div
-									key={i}
+									key={`${tick.percent}-${tick.label}`}
 									className={`metric-tick align-${align}`}
 									style={style}
 								>
