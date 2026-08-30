@@ -1,0 +1,337 @@
+/* ==========================================================================
+   Monitor — cluster status banner, live metrics, excuse generator.
+   ========================================================================== */
+
+.monitor {
+	display: flex;
+	flex-direction: column;
+	gap: 2rem;
+}
+
+/* --- Status banner -------------------------------------------------------- */
+
+.status-card {
+	background: var(--surface);
+	border: 1px solid var(--border);
+	border-radius: var(--radius-lg);
+	padding: 1.5rem;
+	box-shadow: var(--shadow-card);
+}
+
+.status-row {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 1.5rem;
+	flex-wrap: wrap;
+}
+
+.status-id {
+	display: flex;
+	align-items: center;
+	gap: 0.75rem;
+	min-width: 0;
+}
+
+.status-indicator {
+	width: 0.625rem;
+	height: 0.625rem;
+	border-radius: 50%;
+	flex-shrink: 0;
+}
+
+.status-indicator.live {
+	background: var(--status-ok);
+	box-shadow: 0 0 0 4px var(--status-ok-dim);
+	animation: status-breathe 2.5s ease-in-out infinite;
+}
+
+.status-indicator.polling {
+	background: var(--status-warn);
+	box-shadow: 0 0 0 4px var(--status-warn-dim);
+}
+
+.status-indicator.connecting {
+	background: var(--text-tertiary);
+	box-shadow: 0 0 0 4px rgba(109, 118, 134, 0.12);
+}
+
+.status-name {
+	font-size: 0.9375rem;
+	font-weight: 600;
+	letter-spacing: -0.01em;
+}
+
+.status-stream {
+	font-family: var(--font-mono);
+	font-size: 0.6875rem;
+	letter-spacing: 0.06em;
+	text-transform: uppercase;
+	color: var(--text-tertiary);
+	margin-top: 0.15rem;
+}
+
+.status-uptime {
+	text-align: right;
+}
+
+.status-uptime-value {
+	font-family: var(--font-mono);
+	font-size: clamp(1.5rem, 3vw, 1.875rem);
+	font-weight: 600;
+	letter-spacing: -0.02em;
+	color: var(--text-primary);
+	font-feature-settings: "tnum";
+	line-height: 1.1;
+}
+
+.status-uptime-value .unit {
+	font-size: 0.55em;
+	font-weight: 500;
+	color: var(--text-tertiary);
+	margin-left: 0.1em;
+}
+
+.status-uptime-range {
+	display: block;
+	font-family: var(--font-mono);
+	font-size: 0.6875rem;
+	color: var(--text-tertiary);
+	margin-top: 0.25rem;
+	letter-spacing: 0.04em;
+}
+
+.status-note {
+	margin-top: 1rem;
+	padding-top: 1rem;
+	border-top: 1px solid var(--border);
+	font-family: var(--font-mono);
+	font-size: 0.75rem;
+	color: var(--text-tertiary);
+}
+
+/* --- Metrics grid ---------------------------------------------------------- */
+
+.metrics-section {
+	display: flex;
+	flex-direction: column;
+	gap: 0.875rem;
+}
+
+.metrics-grid {
+	display: grid;
+	grid-template-columns: repeat(2, 1fr);
+	gap: 0.875rem;
+}
+
+.metric-card {
+	background: var(--surface);
+	border: 1px solid var(--border);
+	border-radius: var(--radius-md);
+	padding: 1.1rem 1.2rem;
+	display: flex;
+	flex-direction: column;
+	transition: border-color var(--transition-fast);
+}
+
+.metric-card:hover {
+	border-color: var(--border-strong);
+}
+
+.metric-head {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 0.5rem;
+}
+
+.metric-label {
+	font-family: var(--font-mono);
+	font-size: 0.6875rem;
+	font-weight: 500;
+	letter-spacing: 0.09em;
+	text-transform: uppercase;
+	color: var(--text-tertiary);
+}
+
+.metric-icon {
+	width: 0.875rem;
+	height: 0.875rem;
+	color: var(--text-tertiary);
+	flex-shrink: 0;
+}
+
+.metric-value-row {
+	display: flex;
+	align-items: baseline;
+	gap: 0.3rem;
+	margin-top: 0.6rem;
+}
+
+.metric-value {
+	font-family: var(--font-mono);
+	font-size: 1.625rem;
+	font-weight: 600;
+	letter-spacing: -0.02em;
+	color: var(--text-primary);
+	font-feature-settings: "tnum";
+	line-height: 1;
+}
+
+.metric-unit {
+	font-family: var(--font-mono);
+	font-size: 0.75rem;
+	font-weight: 500;
+	color: var(--text-tertiary);
+}
+
+.metric-bar-wrapper {
+	position: relative;
+	margin-top: 0.875rem;
+	padding-bottom: 1.1rem;
+}
+
+.metric-bar-bg {
+	width: 100%;
+	height: 0.1875rem;
+	border-radius: 0.125rem;
+	background: #232935;
+	overflow: hidden;
+}
+
+.metric-bar-fill {
+	height: 100%;
+	border-radius: 0.125rem;
+	transition: width 1s cubic-bezier(0.25, 0.46, 0.45, 0.94), background-color
+		600ms ease;
+}
+
+.metric-bar-fill[data-tone="ok"] {
+	background: var(--status-ok);
+}
+
+.metric-bar-fill[data-tone="warn"] {
+	background: var(--status-warn);
+}
+
+.metric-bar-fill[data-tone="critical"] {
+	background: var(--status-critical);
+}
+
+.metric-ticks-container {
+	position: absolute;
+	top: -0.1875rem;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	pointer-events: none;
+}
+
+.metric-tick {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+}
+
+.metric-tick.align-left {
+	align-items: flex-start;
+}
+
+.metric-tick.align-right {
+	align-items: flex-end;
+}
+
+.metric-tick-line {
+	width: 1px;
+	height: 0.4375rem;
+	background: var(--text-tertiary);
+}
+
+.metric-tick-label {
+	font-family: var(--font-mono);
+	font-size: 0.625rem;
+	color: var(--text-tertiary);
+	margin-top: 0.3rem;
+	line-height: 1;
+}
+
+.metric-description {
+	margin-top: auto;
+	padding-top: 0.875rem;
+	border-top: 1px solid var(--border);
+	font-size: 0.75rem;
+	line-height: 1.55;
+	color: var(--text-tertiary);
+}
+
+/* --- Excuse generator ------------------------------------------------------ */
+
+.excuse-card {
+	background: transparent;
+	border: 1px dashed var(--border-strong);
+	border-radius: var(--radius-md);
+	padding: 1.25rem 1.35rem;
+}
+
+.excuse-head {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 0.75rem;
+	flex-wrap: wrap;
+}
+
+.excuse-title {
+	font-family: var(--font-mono);
+	font-size: 0.6875rem;
+	font-weight: 500;
+	letter-spacing: 0.09em;
+	text-transform: uppercase;
+	color: var(--text-tertiary);
+}
+
+.excuse-roll-btn {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.4rem;
+	padding: 0.4rem 0.8rem;
+	border-radius: var(--radius-sm);
+	border: 1px solid var(--border);
+	background: transparent;
+	color: var(--text-secondary);
+	font-family: var(--font-mono);
+	font-size: 0.75rem;
+	cursor: pointer;
+	transition: border-color var(--transition-fast), color var(--transition-fast),
+		background-color var(--transition-fast);
+}
+
+.excuse-roll-btn:hover {
+	border-color: var(--border-strong);
+	color: var(--text-primary);
+	background: var(--surface);
+}
+
+.excuse-quote {
+	margin-top: 1rem;
+	font-family: var(--font-mono);
+	font-size: 0.8125rem;
+	font-style: italic;
+	line-height: 1.6;
+	color: var(--text-secondary);
+	border-left: 2px solid var(--border-strong);
+	padding-left: 1rem;
+	min-height: 2.6rem;
+	display: flex;
+	align-items: center;
+}
+
+@keyframes status-breathe {
+	0%,
+	100% {
+		box-shadow: 0 0 0 3px var(--status-ok-dim);
+	}
+	50% {
+		box-shadow: 0 0 0 6px var(--status-ok-dim);
+	}
+}

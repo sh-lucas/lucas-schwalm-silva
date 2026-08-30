@@ -1,15 +1,21 @@
-import React from 'react'
+import type { ReactNode } from 'react'
+
+export type MetricTone = 'ok' | 'warn' | 'critical'
+
+interface MetricTick {
+	percent: number
+	label: string
+}
 
 interface MetricCardProps {
-	icon: React.ReactNode
+	icon: ReactNode
 	label: string
-	value: string | number
+	value: string
 	unit: string
 	percent: number
-	barColor: string
-	updateFlash?: boolean
+	tone: MetricTone
 	description: string
-	ticks?: { percent: number; label: string }[]
+	ticks?: MetricTick[]
 }
 
 export function MetricCard({
@@ -18,40 +24,41 @@ export function MetricCard({
 	value,
 	unit,
 	percent,
-	barColor,
+	tone,
 	description,
 	ticks,
 }: MetricCardProps) {
 	return (
-		<div className="metric-card">
-			<div className="metric-header">
-				<div className="metric-title-group">
-					{icon}
-					<span className="metric-label">{label}</span>
-				</div>
+		<article className="metric-card">
+			<div className="metric-head">
+				<span className="metric-label">{label}</span>
+				{icon}
 			</div>
-			<div className="metric-value-container">
+
+			<div className="metric-value-row">
 				<span className="metric-value">{value}</span>
 				<span className="metric-unit">{unit}</span>
 			</div>
+
 			<div className="metric-bar-wrapper">
 				<div className="metric-bar-bg">
 					<div
 						className="metric-bar-fill"
+						data-tone={tone}
 						style={{
 							width: `${Math.min(100, Math.max(0, percent))}%`,
-							background: barColor,
 						}}
 					/>
 				</div>
+
 				{ticks && ticks.length > 0 && (
 					<div className="metric-ticks-container">
-						{ticks.map((tick, i) => {
+						{ticks.map((tick) => {
 							const isStart = tick.percent <= 5
 							const isEnd = tick.percent >= 95
 							const align = isStart ? 'left' : isEnd ? 'right' : 'center'
-							const style: React.CSSProperties = {
-								position: 'absolute',
+							const style = {
+								position: 'absolute' as const,
 								left: isEnd ? 'auto' : `${tick.percent}%`,
 								right: isEnd ? '0%' : 'auto',
 								transform: align === 'center' ? 'translateX(-50%)' : 'none',
@@ -59,7 +66,7 @@ export function MetricCard({
 
 							return (
 								<div
-									key={i}
+									key={tick.label}
 									className={`metric-tick align-${align}`}
 									style={style}
 								>
@@ -71,7 +78,8 @@ export function MetricCard({
 					</div>
 				)}
 			</div>
-			<div className="metric-description">{description}</div>
-		</div>
+
+			<p className="metric-description">{description}</p>
+		</article>
 	)
 }

@@ -1,0 +1,151 @@
+/* ==========================================================================
+   Header — identity block (avatar, name, bio, links).
+   ========================================================================== */
+
+.site-header {
+	display: flex;
+	flex-direction: column;
+	gap: 1.5rem;
+}
+
+.header-top {
+	display: flex;
+	align-items: center;
+	gap: 1.25rem;
+}
+
+.avatar-wrapper {
+	position: relative;
+	width: 4.5rem;
+	height: 4.5rem;
+	flex-shrink: 0;
+}
+
+.avatar-img {
+	width: 100%;
+	height: 100%;
+	border-radius: 50%;
+	object-fit: cover;
+	border: 1px solid var(--border-strong);
+	display: block;
+}
+
+.avatar-status {
+	position: absolute;
+	bottom: -1px;
+	right: -1px;
+	width: 0.875rem;
+	height: 0.875rem;
+	border-radius: 50%;
+	border: 2px solid var(--bg);
+}
+
+.avatar-status.online {
+	background: var(--status-ok);
+	animation: status-pulse 2.5s ease-out infinite;
+}
+
+.avatar-status.offline {
+	background: var(--text-tertiary);
+}
+
+.header-id {
+	display: flex;
+	flex-direction: column;
+	gap: 0.3rem;
+	min-width: 0;
+}
+
+.header-name {
+	font-size: clamp(1.5rem, 4vw, 1.75rem);
+	font-weight: 650;
+	letter-spacing: -0.025em;
+	line-height: 1.15;
+	color: var(--text-primary);
+}
+
+.header-role {
+	font-family: var(--font-mono);
+	font-size: 0.75rem;
+	font-weight: 500;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+	color: var(--text-tertiary);
+}
+
+.header-bio {
+	max-width: 38rem;
+	color: var(--text-secondary);
+	font-size: 0.9375rem;
+	line-height: 1.7;
+}
+
+.header-bio a {
+	color: var(--text-primary);
+	font-weight: 500;
+	text-decoration: none;
+	border-bottom: 1px solid var(--border-strong);
+	transition: border-color var(--transition-fast);
+}
+
+.header-bio a:hover {
+	border-color: var(--text-primary);
+}
+
+/* --- Social links --------------------------------------------------------- */
+
+.social-links {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.5rem;
+}
+
+.social-btn {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.5rem;
+	padding: 0.5rem 0.9rem;
+	border-radius: var(--radius-sm);
+	font-size: 0.8125rem;
+	font-weight: 500;
+	text-decoration: none;
+	cursor: pointer;
+	transition: background-color var(--transition-fast), border-color
+		var(--transition-fast), color var(--transition-fast);
+	white-space: nowrap;
+}
+
+.social-btn.ghost {
+	background: transparent;
+	border: 1px solid var(--border);
+	color: var(--text-secondary);
+}
+
+.social-btn.ghost:hover {
+	border-color: var(--border-strong);
+	color: var(--text-primary);
+	background: var(--surface);
+}
+
+.social-btn.primary {
+	background: var(--text-primary);
+	border: 1px solid var(--text-primary);
+	color: #0b0d10;
+}
+
+.social-btn.primary:hover {
+	background: #ffffff;
+	border-color: #ffffff;
+}
+
+@keyframes status-pulse {
+	0% {
+		box-shadow: 0 0 0 0 var(--status-ok-dim);
+	}
+	70% {
+		box-shadow: 0 0 0 0.5rem transparent;
+	}
+	100% {
+		box-shadow: 0 0 0 0 transparent;
+	}
+}

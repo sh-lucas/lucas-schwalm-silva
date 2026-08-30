@@ -1,0 +1,141 @@
+/* ==========================================================================
+   Base — reset, document defaults, shared primitives.
+   ========================================================================== */
+
+*,
+*::before,
+*::after {
+	box-sizing: border-box;
+	margin: 0;
+	padding: 0;
+}
+
+html {
+	font-size: 16px;
+	scroll-behavior: smooth;
+	/* Prevent horizontal layout shift when switching tabs */
+	scrollbar-gutter: stable;
+	overflow-y: auto;
+}
+
+body {
+	background-color: var(--bg);
+	/* Faint top-center light source — replaces the old marble SVG */
+	background-image: radial-gradient(
+		ellipse 80% 45% at 50% -10%,
+		var(--bg-glow),
+		transparent 70%
+	);
+	background-repeat: no-repeat;
+	color: var(--text-primary);
+	font-family: var(--font-sans);
+	font-feature-settings: "cv11", "ss01";
+	line-height: 1.6;
+	-webkit-font-smoothing: antialiased;
+	text-rendering: optimizeLegibility;
+	overflow-x: hidden;
+	min-width: 320px;
+}
+
+::selection {
+	background: rgba(63, 185, 80, 0.25);
+	color: var(--text-primary);
+}
+
+/* Scrollbars */
+::-webkit-scrollbar {
+	width: 0.5rem;
+	height: 0.5rem;
+}
+::-webkit-scrollbar-track {
+	background: transparent;
+}
+::-webkit-scrollbar-thumb {
+	background: #262c37;
+	border-radius: 0.25rem;
+}
+::-webkit-scrollbar-thumb:hover {
+	background: #313947;
+}
+
+/* Focus */
+:focus-visible {
+	outline: 2px solid var(--status-ok);
+	outline-offset: 2px;
+	border-radius: var(--radius-sm);
+}
+
+a {
+	color: inherit;
+}
+
+button {
+	font-family: inherit;
+}
+
+/* Small uppercase label — the typographic signature of the site */
+.eyebrow {
+	font-family: var(--font-mono);
+	font-size: 0.6875rem;
+	font-weight: 500;
+	letter-spacing: 0.1em;
+	text-transform: uppercase;
+	color: var(--text-tertiary);
+}
+
+/* Section header pattern: index — title — meta */
+.section-head {
+	display: flex;
+	align-items: baseline;
+	gap: 0.75rem;
+	margin-bottom: 1rem;
+}
+
+.section-head-index {
+	font-family: var(--font-mono);
+	font-size: 0.75rem;
+	font-weight: 500;
+	color: var(--text-tertiary);
+}
+
+.section-head-title {
+	font-size: 0.9375rem;
+	font-weight: 600;
+	letter-spacing: -0.01em;
+	color: var(--text-primary);
+}
+
+.section-head-meta {
+	margin-left: auto;
+	font-family: var(--font-mono);
+	font-size: 0.6875rem;
+	color: var(--text-tertiary);
+	white-space: nowrap;
+}
+
+/* Entrance animation shared by tab panels */
+.fade-in {
+	animation: fadeIn 280ms cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+}
+
+@keyframes fadeIn {
+	from {
+		opacity: 0;
+		transform: translateY(6px);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	*,
+	*::before,
+	*::after {
+		animation-duration: 0.01ms !important;
+		animation-iteration-count: 1 !important;
+		transition-duration: 0.01ms !important;
+		scroll-behavior: auto !important;
+	}
+}
