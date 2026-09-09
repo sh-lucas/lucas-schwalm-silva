@@ -63,7 +63,7 @@ function buildMetricConfigs(m: SystemMetrics): MetricConfig[] {
 	return [
 		{
 			icon: <Cpu size={14} className="metric-icon" />,
-			label: 'CPU',
+			label: 'Hamster wheel speed — CPU usage',
 			value: m.cpu_percent.toFixed(1),
 			unit: '%',
 			percent: m.cpu_percent,
@@ -72,7 +72,7 @@ function buildMetricConfigs(m: SystemMetrics): MetricConfig[] {
 		},
 		{
 			icon: <MemoryStick size={14} className="metric-icon" />,
-			label: 'Memory',
+			label: 'Coffee cup fullness — Memory',
 			value: m.memory_percent.toFixed(1),
 			unit: '%',
 			percent: m.memory_percent,
@@ -81,7 +81,7 @@ function buildMetricConfigs(m: SystemMetrics): MetricConfig[] {
 		},
 		{
 			icon: <HardDrive size={14} className="metric-icon" />,
-			label: 'Disk',
+			label: 'Available space for memes — Disk',
 			value: ((m.disk_percent / 100) * 150).toFixed(1),
 			unit: 'GB',
 			percent: m.disk_percent,
@@ -90,7 +90,7 @@ function buildMetricConfigs(m: SystemMetrics): MetricConfig[] {
 		},
 		{
 			icon: <Gauge size={14} className="metric-icon" />,
-			label: 'Pressure · PSI',
+			label: 'Average developer concern — kernel PSI',
 			value: psi.toFixed(1),
 			unit: '%',
 			percent: psiToBarPercent(psi),
