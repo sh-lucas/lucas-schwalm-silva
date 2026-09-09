@@ -23,9 +23,9 @@ const STREAM_LABELS: Record<StreamStatus, string> = {
 }
 
 const getUptimeComment = (uptime: number) => {
-	if (uptime >= 99.5) return 'A quiet week — nothing to report.'
+	if (uptime >= 99) return 'Perfect uptime — something feels odd.'
 	if (uptime > 95) return 'A hiccup or two, all resolved.'
-	if (uptime > 50) return 'A rough week for the nodes.'
+	if (uptime > 50) return 'A rough week for the node.'
 	return 'The cluster has seen better days.'
 }
 
