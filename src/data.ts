@@ -43,7 +43,7 @@ export const EXPERIENCES: Experience[] = [
 		link: 'https://roxcode.io/',
 		highlights: [
 			'Backend development and integrations for multiple projects, including Frigelar, Internacional Shopping, and Nectar Applications.',
-			"Diverse use of NodeJS, Go, SQL and MongoDB for products that need from simplicity to distributed consistency.",
+			'Diverse use of NodeJS, Go, SQL and MongoDB for products that need from simplicity to distributed consistency.',
 			'RAG pipelines, image processing, and text extraction with embedded AI (TFLite) and cloud AI (Vertex AI).',
 		],
 		techs: ['Microservices', 'Golang', 'NestJS', 'SQL', 'MongoDB'],
@@ -72,12 +72,6 @@ export const EXPERIENCES: Experience[] = [
 
 export const PROJECTS: Project[] = [
 	{
-		name: 'lucas-schwalm-silva',
-		link: 'https://github.com/sh-lucas/lucas-schwalm-silva',
-		techs: ['TypeScript', 'React'],
-		desc: 'This very website. A portfolio and live server dashboard built with React and Vite.',
-	},
-	{
 		name: 'Plinth',
 		link: 'https://about.plinth.sh-lucas.dev',
 		techs: ['Web API'],
@@ -88,6 +82,12 @@ export const PROJECTS: Project[] = [
 		link: 'https://github.com/sh-lucas/checkup',
 		techs: ['Rust'],
 		desc: 'Small system monitor and uptime calculator — the backend streaming live metrics to this very dashboard.',
+	},
+	{
+		name: 'honeypot-ops',
+		link: 'https://github.com/sh-lucas/honeypot-ops',
+		techs: ['NixOS', 'Kubernetes', 'FluxCD', 'SOPS'],
+		desc: 'The very soul of my K3s cluster. All production secrets are proudly committed directly to the repo — good luck, though.',
 	},
 	{
 		name: 'libsql-handler',
