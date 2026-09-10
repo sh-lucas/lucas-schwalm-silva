@@ -90,10 +90,10 @@ export const PROJECTS: Project[] = [
 		desc: 'The very soul of my K3s cluster. All production secrets are proudly committed directly to the repo — good luck, though.',
 	},
 	{
-		name: 'libsql-handler',
-		link: 'https://github.com/sh-lucas/libsql-handler',
+		name: 'golang-tmpl',
+		link: 'https://github.com/sh-lucas/golang-tmpl',
 		techs: ['Go'],
-		desc: 'A pure Go implementation of the libSQL Hrana protocol to query remote databases directly without needing sqld.',
+		desc: 'Keep it stupid simple — pretty much how I think a Go project should look like. Features libsql-handler.',
 	},
 ]
 
