@@ -2,42 +2,21 @@
    Sections — experience timeline and project list.
    ========================================================================== */
 
-/* --- Experience timeline ---------------------------------------------------- */
+/* --- Experience ---------------------------------------------------- */
 
 .experience-list {
-	position: relative;
 	display: flex;
 	flex-direction: column;
 	gap: 2rem;
-	padding-left: 1.5rem;
-}
-
-/* Vertical rail connecting entries */
-.experience-list::before {
-	content: "";
-	position: absolute;
-	left: 0.25rem;
-	top: 0.4rem;
-	bottom: 0.4rem;
-	width: 1px;
-	background: var(--border);
 }
 
 .experience-item {
 	position: relative;
-	margin-top: 1.2rem;
 }
 
-.experience-item::before {
-	content: "";
-	position: absolute;
-	left: calc(-1.5rem + 0.25rem - 0.1875rem);
-	top: 0.4rem;
-	width: 0.4375rem;
-	height: 0.4375rem;
-	border-radius: 50%;
-	background: var(--surface-raised);
-	border: 1px solid var(--border-strong);
+.experience-item:not(:last-child) {
+	padding-bottom: 2rem;
+	border-bottom: 1px solid var(--border);
 }
 
 .experience-header {
@@ -49,7 +28,7 @@
 }
 
 .experience-role {
-	font-size: 1rem;
+	font-size: 1.05rem;
 	font-weight: 600;
 	letter-spacing: -0.01em;
 	color: var(--text-primary);
@@ -58,9 +37,8 @@
 .experience-company {
 	display: inline-flex;
 	align-items: center;
-	gap: 0.2rem;
-	font-family: var(--font-mono);
-	font-size: 0.8125rem;
+	gap: 0.25rem;
+	font-size: 0.875rem;
 	font-weight: 500;
 	color: var(--text-secondary);
 	text-decoration: none;
@@ -72,8 +50,8 @@
 }
 
 .company-link-icon {
-	width: 0.75rem;
-	height: 0.75rem;
+	width: 0.8125rem;
+	height: 0.8125rem;
 	color: var(--text-tertiary);
 	flex-shrink: 0;
 	transition: color var(--transition-fast), transform var(--transition-fast);
@@ -86,12 +64,12 @@
 
 .experience-highlights {
 	list-style: none;
-	margin-top: 0.65rem;
+	margin-top: 0.75rem;
 	display: flex;
 	flex-direction: column;
-	gap: 0.4rem;
+	gap: 0.45rem;
 	color: var(--text-secondary);
-	font-size: 0.875rem;
+	font-size: 0.9rem;
 	line-height: 1.65;
 }
 
@@ -115,12 +93,11 @@
 }
 
 .tag {
-	font-family: var(--font-mono);
-	font-size: 0.6875rem;
+	font-size: 0.75rem;
 	color: var(--text-secondary);
 	background: var(--surface);
 	border: 1px solid var(--border);
-	padding: 0.2rem 0.55rem;
+	padding: 0.2rem 0.6rem;
 	border-radius: 99px;
 }
 
@@ -156,8 +133,7 @@
 }
 
 .project-name {
-	font-family: var(--font-mono);
-	font-size: 0.875rem;
+	font-size: 0.9375rem;
 	font-weight: 600;
 	color: var(--text-primary);
 	letter-spacing: -0.01em;

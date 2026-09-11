@@ -155,7 +155,7 @@ export function App() {
 
 			<div className="app-shell">
 				<div className="container">
-					<SiteHeader online={streamStatus === 'sse'} />
+					<SiteHeader />
 
 					<TabNav
 						activeId={activeTab.id}

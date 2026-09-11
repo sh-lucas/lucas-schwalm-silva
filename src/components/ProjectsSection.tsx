@@ -6,7 +6,6 @@ export function ProjectsSection() {
 	return (
 		<section className="fade-in" aria-label="Projects">
 			<div className="section-head">
-				<span className="section-head-index">01</span>
 				<h2 className="section-head-title">Projects</h2>
 				<span className="section-head-meta">selected work</span>
 			</div>

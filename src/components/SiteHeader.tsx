@@ -1,9 +1,5 @@
 import { Github, Linkedin, Mail } from 'lucide-react'
 
-interface SiteHeaderProps {
-	online: boolean
-}
-
 function calculateAge(): number {
 	const birthDate = new Date('2005-02-02')
 	const now = new Date()
@@ -14,7 +10,7 @@ function calculateAge(): number {
 	return age
 }
 
-export function SiteHeader({ online }: SiteHeaderProps) {
+export function SiteHeader() {
 	return (
 		<header className="site-header">
 			<div className="header-top">
@@ -25,10 +21,6 @@ export function SiteHeader({ online }: SiteHeaderProps) {
 						className="avatar-img"
 						width={72}
 						height={72}
-					/>
-					<span
-						className={`avatar-status ${online ? 'online' : 'offline'}`}
-						title={online ? 'Live stream connected' : 'Reconnecting…'}
 					/>
 				</div>
 

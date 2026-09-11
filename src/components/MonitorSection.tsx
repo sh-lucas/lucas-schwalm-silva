@@ -112,12 +112,6 @@ export function MonitorSection({
 }: MonitorSectionProps) {
 	const uptime =
 		clusterUptime !== null && clusterUptime > 0 ? clusterUptime : 100
-	const indicatorClass =
-		streamStatus === 'sse'
-			? 'live'
-			: streamStatus === 'polling'
-				? 'polling'
-				: 'connecting'
 
 	return (
 		<section className="monitor fade-in" aria-label="Live monitor">
@@ -125,7 +119,6 @@ export function MonitorSection({
 			<div className="status-card">
 				<div className="status-row">
 					<div className="status-id">
-						<span className={`status-indicator ${indicatorClass}`} />
 						<div>
 							<div className="status-name">Self-hosted k3s cluster</div>
 							<div className="status-stream">{STREAM_LABELS[streamStatus]}</div>
@@ -147,7 +140,6 @@ export function MonitorSection({
 			{/* Live metrics */}
 			<div className="metrics-section">
 				<div className="section-head">
-					<span className="section-head-index">01</span>
 					<h2 className="section-head-title">System metrics</h2>
 					<span className="section-head-meta">
 						updated {lastUpdated.toLocaleTimeString()}

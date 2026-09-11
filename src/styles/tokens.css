@@ -26,7 +26,7 @@
 	--status-critical-dim: rgba(248, 81, 73, 0.12);
 
 	/* Typography */
-	--font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI",
+	--font-sans: "Open Sans", -apple-system, BlinkMacSystemFont, "Segoe UI",
 		sans-serif;
 	--font-mono: "IBM Plex Mono", "JetBrains Mono", ui-monospace, monospace;
 

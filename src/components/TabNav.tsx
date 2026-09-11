@@ -15,9 +15,6 @@ export function TabNav({ activeId, onChange }: TabNavProps) {
 					className={`tab-btn ${tab.id === activeId ? 'active' : ''}`}
 					onClick={() => onChange(tab.route)}
 				>
-					{tab.id === 'monitor' && (
-						<span className="tab-dot" aria-hidden="true" />
-					)}
 					{tab.label}
 				</button>
 			))}
