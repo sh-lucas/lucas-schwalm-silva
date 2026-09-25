@@ -3,21 +3,153 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Lucas Schwalm Silva — Systems & Full-Stack Engineer</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <title>Lucas Schwalm Silva — Systems &amp; Full-Stack Engineer</title>
+
+  <!-- Preload local self-hosted fonts for parallel zero-CLS loading -->
+  <link rel="preload" href="/fonts/open-sans-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="/fonts/ibm-plex-mono-400-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="/fonts/ibm-plex-mono-500-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="/fonts/ibm-plex-mono-600-latin.woff2" as="font" type="font/woff2" crossorigin>
+
   <script type="module" src="/index.tsx"></script>
   <link rel="stylesheet" href="/index.css">
   <link rel="shortcut icon" href="/src/assets/coffee-favicon.svg" type="image/x-icon">
   <link rel="prefetch" href="https://avatars.githubusercontent.com/u/57202598?s=400&u=07d28aa77c08dcef79364a50831a494c1b16fecf&v=4">
+
   <meta name="description" content="Portfolio and live infrastructure dashboard of Lucas Schwalm Silva — systems and full-stack engineer.">
   <meta name="author" content="Lucas Schwalm Silva">
-  <meta property="og:title" content="Lucas Schwalm Silva — Systems & Full-Stack Engineer">
+  <meta property="og:title" content="Lucas Schwalm Silva — Systems &amp; Full-Stack Engineer">
   <meta property="og:description" content="Portfolio and live infrastructure dashboard.">
   <meta property="og:type" content="website">
+
+  <style>
+    /* Critical base styles to prevent any initial flash or layout jump */
+    :root {
+      --bg: #0b0d10;
+      --bg-glow: rgba(226, 232, 240, 0.035);
+      --text-primary: #eceef2;
+      --font-sans: "Open Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      --font-mono: "IBM Plex Mono", "JetBrains Mono", ui-monospace, monospace;
+    }
+
+    html, body {
+      background-color: var(--bg);
+      background-image: radial-gradient(
+        ellipse 80% 45% at 50% -10%,
+        var(--bg-glow),
+        transparent 70%
+      );
+      background-repeat: no-repeat;
+      color: var(--text-primary);
+      font-family: var(--font-sans);
+      margin: 0;
+      min-height: 100svh;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+
+    /* Fallback card for users without JavaScript */
+    .noscript-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 3rem 1.5rem;
+    }
+
+    .noscript-card {
+      width: 100%;
+      max-width: 44rem;
+      background: #11141a;
+      border: 1px solid #303745;
+      border-radius: 12px;
+      padding: 2rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+    }
+
+    .noscript-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #f85149;
+    }
+
+    .noscript-badge::before {
+      content: "";
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #f85149;
+    }
+
+    .noscript-title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: #eceef2;
+      margin: 0;
+    }
+
+    .noscript-text {
+      color: #a5aebc;
+      font-size: 0.9375rem;
+      line-height: 1.6;
+      margin: 0;
+    }
+
+    .noscript-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.6rem;
+      margin-top: 0.5rem;
+    }
+
+    .noscript-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.5rem 0.9rem;
+      background: #161a22;
+      border: 1px solid #1f242e;
+      border-radius: 6px;
+      color: #eceef2;
+      text-decoration: none;
+      font-size: 0.8125rem;
+      font-weight: 500;
+      transition: border-color 150ms ease;
+    }
+
+    .noscript-link:hover {
+      border-color: #303745;
+    }
+  </style>
 </head>
 <body>
+  <noscript>
+    <div class="noscript-wrap">
+      <div class="noscript-card">
+        <div class="noscript-badge">JavaScript desativado</div>
+        <h1 class="noscript-title">Lucas Schwalm Silva — Systems &amp; Full-Stack Engineer</h1>
+        <p class="noscript-text">
+          Este website e o painel de telemetria em tempo real requerem JavaScript para carregar as métricas do cluster e a navegação interativa.
+        </p>
+        <p class="noscript-text">
+          Você ainda pode conferir meus projetos e entrar em contato pelos links diretos:
+        </p>
+        <div class="noscript-links">
+          <a class="noscript-link" href="https://github.com/sh-lucas" target="_blank" rel="noopener noreferrer">GitHub</a>
+          <a class="noscript-link" href="https://www.linkedin.com/in/lucas-schwalm-silva/" target="_blank" rel="noopener noreferrer">LinkedIn</a>
+          <a class="noscript-link" href="mailto:lucas.schwalm.silva@gmail.com">Contato via Email</a>
+        </div>
+      </div>
+    </div>
+  </noscript>
+
   <div id="container"></div>
 </body>
 </html>

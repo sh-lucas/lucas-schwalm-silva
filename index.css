@@ -3,6 +3,7 @@
    Styles are split by concern under src/styles/ and composed here.
    ========================================================================== */
 
+@import "./src/styles/fonts.css";
 @import "./src/styles/tokens.css";
 @import "./src/styles/base.css";
 @import "./src/styles/layout.css";
