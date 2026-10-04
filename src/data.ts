@@ -32,6 +32,7 @@ export const TABS = [
 	{ id: 'monitor', label: 'Monitor', route: '/metrics' },
 	{ id: 'experience', label: 'Experience', route: '/experience' },
 	{ id: 'projects', label: 'Projects', route: '/projects' },
+	{ id: 'play', label: 'Play', route: '/play' },
 ] as const
 
 export type TabId = (typeof TABS)[number]['id']
@@ -90,10 +91,10 @@ export const PROJECTS: Project[] = [
 		desc: 'The very soul of my K3s cluster. All production secrets are proudly committed directly to the repo — good luck, though.',
 	},
 	{
-		name: 'golang-tmpl',
-		link: 'https://github.com/sh-lucas/golang-tmpl',
-		techs: ['Go'],
-		desc: 'Keep it stupid simple — pretty much how I think a Go project should look like. Features libsql-handler.',
+		name: 'vops',
+		link: 'https://github.com/sh-lucas/vops',
+		techs: ['Go', 'Podman', 'Git'],
+		desc: 'Self-host containers from a Git repo of Compose files. One Go binary with its own registry, rolling releases and rollback.',
 	},
 ]
 

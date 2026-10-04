@@ -12,6 +12,7 @@ export function TabNav({ activeId, onChange }: TabNavProps) {
 				<button
 					key={tab.id}
 					type="button"
+					aria-current={tab.id === activeId ? 'page' : undefined}
 					className={`tab-btn ${tab.id === activeId ? 'active' : ''}`}
 					onClick={() => onChange(tab.route)}
 				>

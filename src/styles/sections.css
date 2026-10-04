@@ -1,243 +1,101 @@
-/* ==========================================================================
-   Sections — experience timeline and project list.
-   ========================================================================== */
-
-/* --- Experience ---------------------------------------------------- */
-
 .experience-list {
 	display: flex;
 	flex-direction: column;
-	gap: 2rem;
+	gap: 2.5rem;
 }
-
-.experience-item {
-	position: relative;
-}
-
 .experience-item:not(:last-child) {
-	padding-bottom: 2rem;
+	padding-bottom: 2.5rem;
 	border-bottom: 1px solid var(--border);
 }
-
 .experience-header {
 	display: flex;
-	align-items: baseline;
-	justify-content: space-between;
-	gap: 0.5rem 1rem;
-	flex-wrap: wrap;
+	flex-direction: column;
+	gap: 0.35rem;
 }
-
 .experience-role {
-	font-size: 1.05rem;
+	font-size: 1.25rem;
 	font-weight: 600;
-	letter-spacing: -0.01em;
+	letter-spacing: -0.025em;
 	color: var(--text-primary);
 }
-
 .experience-company {
-	display: inline-flex;
-	align-items: center;
-	gap: 0.25rem;
-	font-size: 0.875rem;
-	font-weight: 500;
-	color: var(--text-secondary);
-	text-decoration: none;
-	transition: color var(--transition-fast);
+	align-self: start;
+	color: var(--accent);
+	font-size: 0.9375rem;
+	text-underline-offset: 4px;
+	text-decoration-color: transparent;
 }
-
 .experience-company:hover {
-	color: var(--text-primary);
+	text-decoration-color: currentColor;
 }
-
-.company-link-icon {
-	width: 0.8125rem;
-	height: 0.8125rem;
-	color: var(--text-tertiary);
-	flex-shrink: 0;
-	transition: color var(--transition-fast), transform var(--transition-fast);
-}
-
-.experience-company:hover .company-link-icon {
-	color: var(--text-primary);
-	transform: translate(1px, -1px);
-}
-
 .experience-highlights {
-	list-style: none;
-	margin-top: 0.75rem;
+	margin: 1rem 0 0 1.1rem;
 	display: flex;
 	flex-direction: column;
-	gap: 0.45rem;
+	gap: 0.65rem;
 	color: var(--text-secondary);
-	font-size: 0.9rem;
-	line-height: 1.65;
+	font-size: 0.9375rem;
+	line-height: 1.8;
 }
-
-.experience-highlights li {
-	position: relative;
-	padding-left: 1rem;
-}
-
-.experience-highlights li::before {
-	content: "—";
-	position: absolute;
-	left: 0;
+.experience-highlights li::marker {
 	color: var(--text-tertiary);
 }
-
-.experience-tags {
+.experience-tags,
+.project-tags {
 	display: flex;
 	flex-wrap: wrap;
-	gap: 0.375rem;
-	margin-top: 0.875rem;
+	gap: 0.35rem 1rem;
+	margin-top: 1rem;
 }
-
 .tag {
-	font-size: 0.75rem;
-	color: var(--text-secondary);
-	background: var(--surface);
-	border: 1px solid var(--border);
-	padding: 0.2rem 0.6rem;
-	border-radius: 99px;
+	font-size: 0.8125rem;
+	color: var(--text-tertiary);
 }
-
-/* --- Projects ---------------------------------------------------------------- */
-
 .project-list {
 	display: flex;
 	flex-direction: column;
-	gap: 0.75rem;
 }
-
 .project-item {
 	display: block;
-	background: var(--surface);
-	border: 1px solid var(--border);
-	border-radius: var(--radius-md);
-	padding: 1.1rem 1.25rem;
+	padding: 1.75rem 0;
+	border-bottom: 1px solid var(--border);
 	text-decoration: none;
-	transition: border-color var(--transition-fast), background-color
-		var(--transition-fast), transform var(--transition-fast);
 }
-
-.project-item:hover {
-	border-color: var(--border-strong);
-	background: var(--surface-raised);
+.project-item:last-child {
+	border-bottom: 0;
 }
-
 .project-head {
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
 	gap: 0.5rem;
 }
-
 .project-name {
-	font-size: 0.9375rem;
+	font-size: 1.375rem;
 	font-weight: 600;
 	color: var(--text-primary);
-	letter-spacing: -0.01em;
+	letter-spacing: -0.035em;
+	transition: color var(--transition-fast);
 }
-
-.project-link-icon {
-	width: 0.875rem;
-	height: 0.875rem;
-	color: var(--text-tertiary);
-	flex-shrink: 0;
-	transition: color var(--transition-fast), transform var(--transition-fast);
+.project-item:hover .project-name {
+	color: var(--accent);
+	text-decoration: underline;
+	text-underline-offset: 5px;
 }
-
-.project-item:hover .project-link-icon {
-	color: var(--text-primary);
-	transform: translate(2px, -2px);
-}
-
 .project-desc {
-	margin-top: 0.45rem;
+	margin-top: 0.6rem;
 	color: var(--text-secondary);
-	font-size: 0.875rem;
-	line-height: 1.65;
+	font-size: 0.9375rem;
+	line-height: 1.8;
 }
-
-.project-tags {
-	display: flex;
-	flex-wrap: wrap;
-	gap: 0.375rem;
-	margin-top: 0.875rem;
+.project-featured {
+	margin-bottom: 0.5rem;
+	padding: 1.75rem;
+	background: var(--surface);
+	border: 1px solid var(--border);
+	border-left: 3px solid var(--accent);
+	border-radius: var(--radius-sm);
 }
-
-/* ==========================================================================
-   Responsive
-   ========================================================================== */
-
-@media (max-width: 768px) {
-	.container {
-		padding-top: 3rem;
-		gap: 2rem;
-	}
-
-	.metrics-grid {
-		grid-template-columns: 1fr;
-	}
-
-	.status-row {
-		flex-direction: column;
-		align-items: flex-start;
-		gap: 1.25rem;
-	}
-
-	.status-uptime {
-		text-align: left;
-	}
-
-	.section-head-meta {
-		display: none;
-	}
-}
-
-@media (max-width: 640px) {
-	.app-shell {
-		padding: 0 1rem;
-	}
-
-	.container {
-		padding-top: 2.25rem;
-		gap: 1.75rem;
-	}
-
-	.header-top {
-		gap: 1rem;
-	}
-
-	.avatar-wrapper {
-		width: 3.75rem;
-		height: 3.75rem;
-	}
-
-	.site-footer {
-		flex-direction: column;
-		align-items: flex-start;
-		gap: 0.35rem;
-	}
-
-	.tab-btn {
-		font-size: 0.75rem;
-		padding: 0.5rem 0.4rem;
-	}
-
-	.experience-header {
-		flex-direction: column;
-		align-items: flex-start;
-		gap: 0.15rem;
-	}
-
-	.excuse-head {
-		flex-direction: column;
-		align-items: flex-start;
-	}
-
-	.excuse-roll-btn {
-		width: 100%;
-		justify-content: center;
-	}
+.project-featured .project-name {
+	font-size: 2rem;
 }

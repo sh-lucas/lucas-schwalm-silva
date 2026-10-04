@@ -1,23 +1,13 @@
-/* ==========================================================================
-   Monitor — cluster status banner, live metrics, excuse generator.
-   ========================================================================== */
-
 .monitor {
 	display: flex;
 	flex-direction: column;
-	gap: 2rem;
+	gap: 2.5rem;
 }
-
-/* --- Status banner -------------------------------------------------------- */
-
 .status-card {
-	background: var(--surface);
-	border: 1px solid var(--border);
-	border-radius: var(--radius-lg);
-	padding: 1.5rem;
-	box-shadow: var(--shadow-card);
+	border-top: 2px solid var(--accent);
+	border-bottom: 1px solid var(--border);
+	padding: 1.75rem 0;
 }
-
 .status-row {
 	display: flex;
 	align-items: center;
@@ -25,273 +15,179 @@
 	gap: 1.5rem;
 	flex-wrap: wrap;
 }
-
-.status-id {
-	display: flex;
-	align-items: center;
-	gap: 0.75rem;
-	min-width: 0;
-}
-
 .status-name {
-	font-size: 1rem;
+	font-size: 1.125rem;
 	font-weight: 600;
-	letter-spacing: -0.01em;
+	letter-spacing: -0.025em;
 }
-
 .status-stream {
-	font-size: 0.75rem;
+	font-size: 0.8125rem;
 	color: var(--text-tertiary);
-	margin-top: 0.2rem;
+	margin-top: 0.4rem;
 }
-
 .status-uptime {
 	text-align: right;
 }
-
 .status-uptime-value {
-	font-family: var(--font-mono);
-	font-size: clamp(1.5rem, 3vw, 1.875rem);
-	font-weight: 600;
-	letter-spacing: -0.02em;
-	color: var(--text-primary);
-	font-feature-settings: "tnum";
+	font-size: 2.5rem;
+	font-weight: 500;
+	letter-spacing: -0.05em;
+	font-variant-numeric: tabular-nums;
 	line-height: 1.1;
 }
-
 .status-uptime-value .unit {
-	font-size: 0.55em;
-	font-weight: 500;
+	font-size: 0.5em;
 	color: var(--text-tertiary);
-	margin-left: 0.1em;
+	margin-left: 0.15em;
 }
-
 .status-uptime-range {
 	display: block;
-	font-family: var(--font-mono);
-	font-size: 0.6875rem;
-	color: var(--text-tertiary);
-	margin-top: 0.25rem;
-	letter-spacing: 0.04em;
-}
-
-.status-note {
-	margin-top: 1rem;
-	padding-top: 1rem;
-	border-top: 1px solid var(--border);
-	font-family: var(--font-mono);
 	font-size: 0.75rem;
 	color: var(--text-tertiary);
+	margin-top: 0.5rem;
 }
-
-/* --- Metrics grid ---------------------------------------------------------- */
-
-.metrics-section {
-	display: flex;
-	flex-direction: column;
-	gap: 0.875rem;
+.status-note {
+	margin-top: 1.5rem;
+	font-size: 0.875rem;
+	color: var(--text-secondary);
 }
-
 .metrics-grid {
 	display: grid;
-	grid-template-columns: repeat(2, 1fr);
-	gap: 0.875rem;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	gap: 2rem;
 }
-
 .metric-card {
-	background: var(--surface);
-	border: 1px solid var(--border);
-	border-radius: var(--radius-md);
-	padding: 1.1rem 1.2rem;
 	display: flex;
 	flex-direction: column;
-	transition: border-color var(--transition-fast);
+	min-width: 0;
 }
-
-.metric-card:hover {
-	border-color: var(--border-strong);
-}
-
-.metric-head {
-	display: flex;
-	align-items: center;
-	justify-content: space-between;
-	gap: 0.5rem;
-}
-
 .metric-label {
-	font-family: var(--font-mono);
-	font-size: 0.6875rem;
-	font-weight: 500;
-	letter-spacing: 0.09em;
-	text-transform: uppercase;
-	color: var(--text-tertiary);
+	font-size: 0.9375rem;
+	color: var(--text-secondary);
 }
-
-.metric-icon {
-	width: 0.875rem;
-	height: 0.875rem;
-	color: var(--text-tertiary);
-	flex-shrink: 0;
-}
-
 .metric-value-row {
 	display: flex;
 	align-items: baseline;
-	gap: 0.3rem;
-	margin-top: 0.6rem;
+	gap: 0.4rem;
+	margin-top: 0.5rem;
 }
-
 .metric-value {
-	font-family: var(--font-mono);
-	font-size: 1.625rem;
-	font-weight: 600;
-	letter-spacing: -0.02em;
-	color: var(--text-primary);
-	font-feature-settings: "tnum";
-	line-height: 1;
-}
-
-.metric-unit {
-	font-family: var(--font-mono);
-	font-size: 0.75rem;
+	font-size: 2.75rem;
 	font-weight: 500;
+	letter-spacing: -0.05em;
+	font-variant-numeric: tabular-nums;
+	line-height: 1.2;
+}
+.metric-unit {
+	font-size: 0.9375rem;
 	color: var(--text-tertiary);
 }
-
 .metric-bar-wrapper {
 	position: relative;
-	margin-top: 0.875rem;
+	margin-top: 1rem;
 	padding-bottom: 1.1rem;
 }
-
 .metric-bar-bg {
 	width: 100%;
-	height: 0.1875rem;
-	border-radius: 0.125rem;
-	background: #232935;
+	height: 3px;
+	background: var(--border);
 	overflow: hidden;
 }
-
 .metric-bar-fill {
 	height: 100%;
-	border-radius: 0.125rem;
-	transition: width 1s cubic-bezier(0.25, 0.46, 0.45, 0.94), background-color
-		600ms ease;
+	transition: width 1s ease, background-color 600ms ease;
 }
-
 .metric-bar-fill[data-tone="ok"] {
 	background: var(--status-ok);
 }
-
 .metric-bar-fill[data-tone="warn"] {
 	background: var(--status-warn);
 }
-
 .metric-bar-fill[data-tone="critical"] {
 	background: var(--status-critical);
 }
-
 .metric-ticks-container {
 	position: absolute;
-	top: -0.1875rem;
+	top: -3px;
 	left: 0;
 	width: 100%;
 	height: 100%;
 	pointer-events: none;
 }
-
 .metric-tick {
 	display: flex;
 	flex-direction: column;
 	align-items: center;
 }
-
 .metric-tick.align-left {
 	align-items: flex-start;
 }
-
 .metric-tick.align-right {
 	align-items: flex-end;
 }
-
 .metric-tick-line {
 	width: 1px;
-	height: 0.4375rem;
+	height: 7px;
 	background: var(--text-tertiary);
 }
-
 .metric-tick-label {
-	font-family: var(--font-mono);
-	font-size: 0.625rem;
+	font-size: 0.6875rem;
 	color: var(--text-tertiary);
 	margin-top: 0.3rem;
 	line-height: 1;
 }
-
 .metric-description {
 	margin-top: auto;
-	padding-top: 0.875rem;
-	border-top: 1px solid var(--border);
-	font-size: 0.75rem;
-	line-height: 1.55;
+	padding-top: 0.5rem;
+	font-size: 0.8125rem;
+	line-height: 1.7;
 	color: var(--text-tertiary);
 }
-
-/* --- Excuse generator ------------------------------------------------------ */
-
 .excuse-card {
-	background: var(--surface);
-	border: 1px solid var(--border);
-	border-radius: var(--radius-md);
-	padding: 1.25rem 1.35rem;
+	padding-top: 1.5rem;
+	border-top: 1px solid var(--border);
 }
-
 .excuse-head {
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
-	gap: 0.75rem;
-	flex-wrap: wrap;
+	gap: 1rem;
 }
-
 .excuse-title {
-	font-size: 0.75rem;
-	font-weight: 600;
-	letter-spacing: 0.05em;
-	text-transform: uppercase;
+	font-size: 0.875rem;
 	color: var(--text-tertiary);
 }
-
 .excuse-roll-btn {
-	display: inline-flex;
-	align-items: center;
-	gap: 0.4rem;
-	padding: 0.4rem 0.8rem;
-	border-radius: var(--radius-sm);
-	border: 1px solid var(--border);
+	border: 0;
+	padding: 0.5rem 0;
 	background: transparent;
-	color: var(--text-secondary);
+	color: var(--accent);
 	font-size: 0.8125rem;
-	font-weight: 500;
 	cursor: pointer;
-	transition: border-color var(--transition-fast), color var(--transition-fast),
-		background-color var(--transition-fast);
+	text-decoration: underline;
+	text-underline-offset: 4px;
 }
-
-.excuse-roll-btn:hover {
-	border-color: var(--border-strong);
-	color: var(--text-primary);
-	background: var(--surface-raised);
-}
-
 .excuse-quote {
-	margin-top: 0.875rem;
-	font-size: 0.875rem;
-	font-style: italic;
-	line-height: 1.6;
+	margin-top: 0.75rem;
+	font-size: 0.9375rem;
+	line-height: 1.8;
 	color: var(--text-secondary);
-	min-height: 2.6rem;
-	display: flex;
-	align-items: center;
+	min-height: 3.5rem;
+}
+@media (max-width: 480px) {
+	.metrics-grid {
+		gap: 1.75rem 1rem;
+	}
+	.metric-value {
+		font-size: 2.25rem;
+	}
+	.status-name {
+		font-size: 1rem;
+	}
+	.status-uptime-value {
+		font-size: 2rem;
+	}
+	.status-row {
+		gap: 1rem;
+	}
 }

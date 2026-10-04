@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import { Navigate, useLocation, useNavigate } from 'react-router-dom'
 
+import { CafeSection } from './components/CafeSection'
 import { ExperienceSection } from './components/ExperienceSection'
 import { MonitorSection } from './components/MonitorSection'
 import { ProjectsSection } from './components/ProjectsSection'
@@ -34,7 +35,7 @@ export function App() {
 	// Real-time server metrics
 	const [metrics, setMetrics] = useState<SystemMetrics>(EMPTY_METRICS)
 	const [streamStatus, setStreamStatus] = useState<StreamStatus>('connecting')
-	const [lastUpdated, setLastUpdated] = useState<Date>(() => new Date())
+	const [lastUpdated, setLastUpdated] = useState<Date | null>(null)
 	const [clusterUptime, setClusterUptime] = useState<number | null>(null)
 
 	// Easter egg
@@ -175,6 +176,7 @@ export function App() {
 						)}
 						{activeTab.id === 'experience' && <ExperienceSection />}
 						{activeTab.id === 'projects' && <ProjectsSection />}
+						{activeTab.id === 'play' && <CafeSection />}
 					</main>
 				</div>
 

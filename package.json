@@ -5,10 +5,11 @@
 	"scripts": {
 		"dev": "vite",
 		"build": "tsc && vite build && tsx scripts/prerender.ts",
-		"preview": "vite preview"
+		"preview": "vite preview",
+		"cafe:setup": "tsx scripts/setup-cafe.ts",
+		"cafe:check": "tsx scripts/check-cafe.ts"
 	},
 	"dependencies": {
-		"lucide-react": "^0.436.0",
 		"react": "^18.3.1",
 		"react-dom": "^18.3.1",
 		"react-router-dom": "^7.18.1"

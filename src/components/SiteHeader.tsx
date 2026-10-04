@@ -1,5 +1,3 @@
-import { Github, Linkedin, Mail } from 'lucide-react'
-
 function calculateAge(): number {
 	const birthDate = new Date('2005-02-02')
 	const now = new Date()
@@ -26,7 +24,7 @@ export function SiteHeader() {
 
 				<div className="header-id">
 					<h1 className="header-name">Lucas Schwalm Silva</h1>
-					<span className="header-role">Systems &amp; Full-Stack Engineer</span>
+					<span className="header-role">Systems &amp; full-stack engineer</span>
 				</div>
 			</div>
 
@@ -46,7 +44,7 @@ export function SiteHeader() {
 					rel="noopener noreferrer"
 					className="social-btn ghost"
 				>
-					<Github size={15} /> GitHub
+					GitHub
 				</a>
 				<a
 					href="https://www.linkedin.com/in/lucas-schwalm-silva/"
@@ -54,13 +52,13 @@ export function SiteHeader() {
 					rel="noopener noreferrer"
 					className="social-btn ghost"
 				>
-					<Linkedin size={15} /> LinkedIn
+					LinkedIn
 				</a>
 				<a
 					href="mailto:lucas.schwalm.silva@gmail.com"
 					className="social-btn primary"
 				>
-					<Mail size={15} /> Contact
+					Contact
 				</a>
 			</div>
 		</header>

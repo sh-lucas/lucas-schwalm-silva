@@ -1,6 +1,3 @@
-import { Cpu, Gauge, HardDrive, MemoryStick } from 'lucide-react'
-import type { ReactNode } from 'react'
-
 import type { SystemMetrics } from '../data'
 import { ExcuseGenerator } from './ExcuseGenerator'
 import { MetricCard, type MetricTone } from './MetricCard'
@@ -10,7 +7,7 @@ type StreamStatus = 'sse' | 'polling' | 'connecting'
 interface MonitorSectionProps {
 	metrics: SystemMetrics
 	streamStatus: StreamStatus
-	lastUpdated: Date
+	lastUpdated: Date | null
 	clusterUptime: number | null
 	excuse: string
 	onRollExcuse: () => void
@@ -47,7 +44,6 @@ function psiToBarPercent(psi: number): number {
 }
 
 interface MetricConfig {
-	icon: ReactNode
 	label: string
 	value: string
 	unit: string
@@ -62,8 +58,7 @@ function buildMetricConfigs(m: SystemMetrics): MetricConfig[] {
 
 	return [
 		{
-			icon: <Cpu size={14} className="metric-icon" />,
-			label: 'Hamster wheel speed — CPU usage',
+			label: 'CPU usage',
 			value: m.cpu_percent.toFixed(1),
 			unit: '%',
 			percent: m.cpu_percent,
@@ -71,8 +66,7 @@ function buildMetricConfigs(m: SystemMetrics): MetricConfig[] {
 			description: 'Utilization across 2 dedicated vCPUs.',
 		},
 		{
-			icon: <MemoryStick size={14} className="metric-icon" />,
-			label: 'Coffee cup fullness — Memory',
+			label: 'Memory',
 			value: m.memory_percent.toFixed(1),
 			unit: '%',
 			percent: m.memory_percent,
@@ -80,8 +74,7 @@ function buildMetricConfigs(m: SystemMetrics): MetricConfig[] {
 			description: 'Usage across 12 GB of RAM.',
 		},
 		{
-			icon: <HardDrive size={14} className="metric-icon" />,
-			label: 'Available space for memes — Disk',
+			label: 'Disk space',
 			value: ((m.disk_percent / 100) * 150).toFixed(1),
 			unit: 'GB',
 			percent: m.disk_percent,
@@ -89,8 +82,7 @@ function buildMetricConfigs(m: SystemMetrics): MetricConfig[] {
 			description: 'Used space on the 150 GB NVMe volume.',
 		},
 		{
-			icon: <Gauge size={14} className="metric-icon" />,
-			label: 'Average developer concern — kernel PSI',
+			label: 'Resource pressure',
 			value: psi.toFixed(1),
 			unit: '%',
 			percent: psiToBarPercent(psi),
@@ -110,8 +102,7 @@ export function MonitorSection({
 	excuse,
 	onRollExcuse,
 }: MonitorSectionProps) {
-	const uptime =
-		clusterUptime !== null && clusterUptime > 0 ? clusterUptime : 100
+	const uptime = clusterUptime
 
 	return (
 		<section className="monitor fade-in" aria-label="Live monitor">
@@ -127,14 +118,18 @@ export function MonitorSection({
 
 					<div className="status-uptime">
 						<div className="status-uptime-value">
-							{uptime.toFixed(2)}
+							{uptime === null ? '—' : uptime.toFixed(2)}
 							<span className="unit">%</span>
 						</div>
-						<span className="status-uptime-range">uptime · past week</span>
+						<span className="status-uptime-range">uptime · server window</span>
 					</div>
 				</div>
 
-				<p className="status-note">{getUptimeComment(uptime)}</p>
+				<p className="status-note">
+					{uptime === null
+						? 'Waiting for the first reading.'
+						: getUptimeComment(uptime)}
+				</p>
 			</div>
 
 			{/* Live metrics */}
@@ -142,13 +137,20 @@ export function MonitorSection({
 				<div className="section-head">
 					<h2 className="section-head-title">System metrics</h2>
 					<span className="section-head-meta">
-						updated {lastUpdated.toLocaleTimeString()}
+						{lastUpdated
+							? `updated ${lastUpdated.toLocaleTimeString()}`
+							: 'waiting for a reading'}
 					</span>
 				</div>
 
 				<div className="metrics-grid">
 					{buildMetricConfigs(metrics).map((config) => (
-						<MetricCard key={config.label} {...config} />
+						<MetricCard
+							key={config.label}
+							{...config}
+							value={lastUpdated ? config.value : '—'}
+							percent={lastUpdated ? config.percent : 0}
+						/>
 					))}
 				</div>
 			</div>

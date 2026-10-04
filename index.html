@@ -7,9 +7,6 @@
 
   <!-- Preload local self-hosted fonts for parallel zero-CLS loading -->
   <link rel="preload" href="/fonts/open-sans-latin.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="preload" href="/fonts/ibm-plex-mono-400-latin.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="preload" href="/fonts/ibm-plex-mono-500-latin.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="preload" href="/fonts/ibm-plex-mono-600-latin.woff2" as="font" type="font/woff2" crossorigin>
 
   <script type="module" src="/index.tsx"></script>
   <link rel="stylesheet" href="/index.css">
@@ -25,21 +22,14 @@
   <style>
     /* Critical base styles to prevent any initial flash or layout jump */
     :root {
-      --bg: #0b0d10;
-      --bg-glow: rgba(226, 232, 240, 0.035);
-      --text-primary: #eceef2;
+      --bg: #191917;
+      --text-primary: #f0ece2;
       --font-sans: "Open Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      --font-mono: "IBM Plex Mono", "JetBrains Mono", ui-monospace, monospace;
+      --font-mono: "IBM Plex Mono", ui-monospace, monospace;
     }
 
     html, body {
       background-color: var(--bg);
-      background-image: radial-gradient(
-        ellipse 80% 45% at 50% -10%,
-        var(--bg-glow),
-        transparent 70%
-      );
-      background-repeat: no-repeat;
       color: var(--text-primary);
       font-family: var(--font-sans);
       margin: 0;
@@ -59,8 +49,8 @@
     .noscript-card {
       width: 100%;
       max-width: 44rem;
-      background: #11141a;
-      border: 1px solid #303745;
+      background: #20201d;
+      border: 1px solid #575348;
       border-radius: 12px;
       padding: 2rem;
       display: flex;
@@ -73,10 +63,7 @@
       display: inline-flex;
       align-items: center;
       gap: 0.5rem;
-      font-family: var(--font-mono);
       font-size: 0.75rem;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
       color: #f85149;
     }
 
@@ -91,12 +78,12 @@
     .noscript-title {
       font-size: 1.25rem;
       font-weight: 700;
-      color: #eceef2;
+      color: #f0ece2;
       margin: 0;
     }
 
     .noscript-text {
-      color: #a5aebc;
+      color: #bcb7aa;
       font-size: 0.9375rem;
       line-height: 1.6;
       margin: 0;
@@ -114,10 +101,10 @@
       align-items: center;
       gap: 0.4rem;
       padding: 0.5rem 0.9rem;
-      background: #161a22;
-      border: 1px solid #1f242e;
+      background: #282723;
+      border: 1px solid #35342e;
       border-radius: 6px;
-      color: #eceef2;
+      color: #f0ece2;
       text-decoration: none;
       font-size: 0.8125rem;
       font-weight: 500;
@@ -125,7 +112,7 @@
     }
 
     .noscript-link:hover {
-      border-color: #303745;
+      border-color: #575348;
     }
   </style>
 </head>

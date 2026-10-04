@@ -1,5 +1,3 @@
-import type { ReactNode } from 'react'
-
 export type MetricTone = 'ok' | 'warn' | 'critical'
 
 interface MetricTick {
@@ -8,7 +6,6 @@ interface MetricTick {
 }
 
 interface MetricCardProps {
-	icon: ReactNode
 	label: string
 	value: string
 	unit: string
@@ -19,7 +16,6 @@ interface MetricCardProps {
 }
 
 export function MetricCard({
-	icon,
 	label,
 	value,
 	unit,
@@ -32,7 +28,6 @@ export function MetricCard({
 		<article className="metric-card">
 			<div className="metric-head">
 				<span className="metric-label">{label}</span>
-				{icon}
 			</div>
 
 			<div className="metric-value-row">

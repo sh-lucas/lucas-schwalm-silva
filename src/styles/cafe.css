@@ -1,0 +1,324 @@
+.cafe {
+	display: flex;
+	flex-direction: column;
+	gap: 1.75rem;
+}
+.section-kicker {
+	font-size: 0.8125rem;
+	color: var(--accent);
+	margin-bottom: 0.75rem;
+}
+.cafe-intro h2 {
+	font-size: clamp(2.5rem, 5vw, 3.75rem);
+	font-weight: 500;
+	line-height: 1.12;
+	letter-spacing: -0.055em;
+}
+.cafe-intro h2 em {
+	font-family: Georgia, serif;
+	font-weight: 400;
+	color: var(--accent);
+	letter-spacing: -0.035em;
+}
+.cafe-intro > p:last-child {
+	max-width: 32rem;
+	margin-top: 1.25rem;
+	font-size: 0.9375rem;
+	line-height: 1.8;
+	color: var(--text-secondary);
+}
+.cafe-opening {
+	display: flex;
+	align-items: center;
+	gap: 2rem;
+	padding: 2rem;
+	background: var(--surface);
+	border: 1px solid var(--border);
+	border-radius: var(--radius-md);
+}
+.cafe-opening h3,
+.cafe-order h3 {
+	font-size: 1.375rem;
+	font-weight: 500;
+	line-height: 1.4;
+	letter-spacing: -0.025em;
+}
+.cafe-opening p,
+.cafe-order p:not(.section-kicker) {
+	font-size: 0.875rem;
+	line-height: 1.8;
+	color: var(--text-secondary);
+	margin-top: 0.5rem;
+}
+.cafe-opening .action-button {
+	margin-top: 1.25rem;
+}
+.cafe-cup {
+	width: 5rem;
+	flex-shrink: 0;
+	padding-top: 1rem;
+}
+.cup-body {
+	position: relative;
+	width: 3.5rem;
+	height: 3rem;
+	border: 2px solid var(--accent);
+	border-radius: 2px 2px 18px 18px;
+	background: linear-gradient(
+		to bottom,
+		transparent 12%,
+		#714d37 12%,
+		#714d37 26%,
+		transparent 26%
+	);
+}
+.cup-body::after {
+	content: "";
+	position: absolute;
+	left: 100%;
+	top: 3px;
+	width: 1rem;
+	height: 1.7rem;
+	border: 2px solid var(--accent);
+	border-left: 0;
+	border-radius: 0 12px 12px 0;
+}
+.cup-saucer {
+	width: 4.5rem;
+	height: 2px;
+	margin: 6px 0 0 -0.5rem;
+	background: var(--accent);
+}
+.action-button {
+	background: var(--accent);
+	color: #271c15;
+	border: 1px solid var(--accent);
+	border-radius: var(--radius-sm);
+	padding: 0.75rem 1rem;
+	font-size: 0.875rem;
+	font-weight: 600;
+	cursor: pointer;
+	transition: background-color var(--transition-fast);
+}
+.action-button:hover:not(:disabled) {
+	background: #f1c5a7;
+}
+.text-button {
+	padding: 0.5rem 0;
+	border: 0;
+	background: transparent;
+	color: var(--accent);
+	font-size: 0.8125rem;
+	text-decoration: underline;
+	text-underline-offset: 4px;
+	cursor: pointer;
+	text-align: left;
+}
+button:disabled {
+	opacity: 0.5;
+	cursor: not-allowed;
+}
+.cafe-counter {
+	display: grid;
+	grid-template-columns: repeat(3, minmax(0, 1fr));
+	border-block: 1px solid var(--border);
+	padding: 1.5rem 0;
+	gap: 1rem;
+}
+.cafe-counter > div > span {
+	font-size: 0.8125rem;
+	color: var(--text-secondary);
+}
+.cafe-counter strong {
+	display: block;
+	font-size: 2.5rem;
+	font-weight: 500;
+	font-variant-numeric: tabular-nums;
+	letter-spacing: -0.05em;
+	line-height: 1.3;
+	margin-top: 0.25rem;
+}
+.cafe-counter small {
+	font-size: 0.75rem;
+	font-weight: 400;
+	letter-spacing: 0;
+	color: var(--text-tertiary);
+}
+.cafe-order {
+	display: flex;
+	justify-content: space-between;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 1.5rem;
+	background: var(--surface);
+	border-left: 3px solid var(--accent);
+	padding: 1.5rem;
+}
+.cafe-actions {
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	gap: 0.5rem;
+}
+.pantry-note {
+	flex-basis: 100%;
+}
+.cafe-experiment {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: start;
+	justify-content: space-between;
+	gap: 1rem;
+}
+.cafe-experiment h3 {
+	font-size: 1rem;
+	font-weight: 600;
+}
+.cafe-experiment p {
+	max-width: 30rem;
+	font-size: 0.8125rem;
+	line-height: 1.8;
+	margin-top: 0.4rem;
+	color: var(--text-secondary);
+}
+.race-results {
+	flex-basis: 100%;
+	list-style: none;
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 1rem;
+}
+.race-results li {
+	padding: 1rem;
+	border: 1px solid var(--border);
+	font-size: 0.8125rem;
+}
+.race-results strong,
+.race-results span {
+	display: block;
+}
+.race-results strong {
+	color: var(--status-warn);
+	margin-bottom: 0.4rem;
+}
+.race-results li[data-committed="true"] strong {
+	color: var(--status-ok);
+}
+.race-results span {
+	color: var(--text-secondary);
+	line-height: 1.7;
+}
+.cafe-receipt {
+	background: #e9e2d3;
+	color: #302d26;
+	border-radius: var(--radius-sm);
+	padding: 1.25rem 1.5rem;
+}
+.cafe-receipt > summary {
+	cursor: pointer;
+	font-size: 1rem;
+	padding-bottom: 0.25rem;
+}
+.cafe-receipt > summary > span {
+	display: block;
+	margin-top: 0.35rem;
+	font-size: 0.75rem;
+	color: #655e51;
+}
+.cafe-receipt ol {
+	list-style: none;
+	margin-top: 1rem;
+	max-height: 24rem;
+	overflow: auto;
+}
+.cafe-receipt li {
+	border-top: 1px dashed #b8af9d;
+	padding: 1rem 0;
+}
+.cafe-receipt li > div {
+	display: flex;
+	justify-content: space-between;
+	align-items: baseline;
+	gap: 1rem;
+	font-size: 0.8125rem;
+}
+.cafe-receipt li strong {
+	font-weight: 600;
+}
+.cafe-receipt time {
+	flex-shrink: 0;
+	color: #655e51;
+	font-size: 0.6875rem;
+}
+.cafe-receipt li p {
+	font-size: 0.75rem;
+	margin-top: 0.35rem;
+	color: #655e51;
+	line-height: 1.7;
+}
+.cafe-receipt li details {
+	margin-top: 0.5rem;
+	font-size: 0.6875rem;
+	color: #655e51;
+}
+.cafe-receipt li summary {
+	cursor: pointer;
+}
+.cafe-receipt code {
+	display: block;
+	font-family: var(--font-mono);
+	margin-top: 0.5rem;
+	overflow-wrap: anywhere;
+}
+.cafe-feedback:empty {
+	display: none;
+}
+.cafe-feedback {
+	font-size: 0.875rem;
+	line-height: 1.7;
+	color: var(--status-warn);
+}
+.receipt-refresh {
+	align-self: start;
+}
+.cafe-credit {
+	font-size: 0.8125rem;
+	line-height: 1.8;
+	color: var(--text-tertiary);
+	border-top: 1px solid var(--border);
+	padding-top: 1.5rem;
+}
+.cafe-credit a {
+	color: var(--accent);
+	text-underline-offset: 4px;
+}
+@media (max-width: 480px) {
+	.cafe-opening {
+		padding: 1.5rem;
+		gap: 1.25rem;
+		flex-direction: column;
+		align-items: start;
+	}
+	.cafe-counter {
+		gap: 0.75rem;
+	}
+	.cafe-counter strong {
+		font-size: 2rem;
+	}
+	.cafe-counter small {
+		display: block;
+	}
+	.cafe-order {
+		padding: 1.25rem;
+	}
+	.race-results {
+		grid-template-columns: 1fr;
+	}
+	.cafe-receipt {
+		padding: 1.25rem;
+	}
+}
+
+.cafe-receipt :focus-visible {
+	outline-color: #302d26;
+}

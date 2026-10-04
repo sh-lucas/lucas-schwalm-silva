@@ -1,5 +1,3 @@
-import { ArrowUpRight } from 'lucide-react'
-
 import { PROJECTS } from '../data'
 
 export function ProjectsSection() {
@@ -17,11 +15,10 @@ export function ProjectsSection() {
 						href={project.link}
 						target="_blank"
 						rel="noopener noreferrer"
-						className="project-item"
+						className={`project-item ${project.name === 'Plinth' ? 'project-featured' : ''}`}
 					>
 						<div className="project-head">
 							<span className="project-name">{project.name}</span>
-							<ArrowUpRight size={14} className="project-link-icon" />
 						</div>
 						<p className="project-desc">{project.desc}</p>
 						<div className="project-tags">

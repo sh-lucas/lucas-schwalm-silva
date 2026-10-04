@@ -20,13 +20,6 @@ html {
 
 body {
 	background-color: var(--bg);
-	/* Faint top-center light source — replaces the old marble SVG */
-	background-image: radial-gradient(
-		ellipse 80% 45% at 50% -10%,
-		var(--bg-glow),
-		transparent 70%
-	);
-	background-repeat: no-repeat;
 	color: var(--text-primary);
 	font-family: var(--font-sans);
 	line-height: 1.6;
@@ -37,7 +30,7 @@ body {
 }
 
 ::selection {
-	background: rgba(63, 185, 80, 0.25);
+	background: rgba(230, 174, 135, 0.25);
 	color: var(--text-primary);
 }
 
@@ -59,7 +52,7 @@ body {
 
 /* Focus */
 :focus-visible {
-	outline: 2px solid var(--status-ok);
+	outline: 2px solid var(--accent);
 	outline-offset: 2px;
 	border-radius: var(--radius-sm);
 }
@@ -70,16 +63,6 @@ a {
 
 button {
 	font-family: inherit;
-}
-
-/* Small uppercase label — the typographic signature of the site */
-.eyebrow {
-	font-family: var(--font-mono);
-	font-size: 0.6875rem;
-	font-weight: 500;
-	letter-spacing: 0.1em;
-	text-transform: uppercase;
-	color: var(--text-tertiary);
 }
 
 /* Section header pattern: title — meta */

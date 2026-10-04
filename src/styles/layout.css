@@ -1,90 +1,100 @@
-/* ==========================================================================
-   Layout — app shell, navigation, footer.
-   ========================================================================== */
-
 .app-shell {
 	min-height: 100svh;
 	display: flex;
 	flex-direction: column;
 	align-items: center;
-	padding: 0 1.5rem;
+	padding: 0 2rem;
 }
-
 .container {
 	width: 100%;
 	max-width: var(--content-width);
-	display: flex;
-	flex-direction: column;
-	gap: 2.5rem;
-	padding: 4rem 0 3rem;
+	display: grid;
+	grid-template-columns: 19rem minmax(0, 1fr);
+	column-gap: 5rem;
+	row-gap: 2.5rem;
+	padding: 5rem 0;
 	flex: 1;
+	align-content: start;
 }
-
-/* --- Tab navigation ---------------------------------------------------- */
-
+.site-header {
+	grid-column: 1;
+	grid-row: 1 / span 2;
+	align-self: start;
+	position: sticky;
+	top: 3rem;
+}
 .tab-nav {
+	grid-column: 2;
 	display: flex;
-	gap: 0.25rem;
-	padding: 0.25rem;
-	background: var(--surface);
-	border: 1px solid var(--border);
-	border-radius: var(--radius-md);
+	gap: 1.75rem;
+	border-bottom: 1px solid var(--border);
 }
-
 .tab-btn {
-	flex: 1;
-	display: inline-flex;
-	align-items: center;
-	justify-content: center;
-	gap: 0.45rem;
-	padding: 0.55rem 0.75rem;
-	border: 1px solid transparent;
-	border-radius: calc(var(--radius-md) - 3px);
+	padding: 0 0 0.85rem;
+	margin-bottom: -1px;
+	border: 0;
+	border-bottom: 2px solid transparent;
 	background: transparent;
-	color: var(--text-tertiary);
-	font-size: 0.8125rem;
-	font-weight: 500;
-	letter-spacing: 0.01em;
-	cursor: pointer;
-	transition: color var(--transition-fast), background-color
-		var(--transition-fast), border-color var(--transition-fast);
-	white-space: nowrap;
-}
-
-.tab-btn:hover {
 	color: var(--text-secondary);
+	font-size: 0.9375rem;
+	cursor: pointer;
+	transition: color var(--transition-fast);
 }
-
-.tab-btn.active {
-	background: var(--surface-raised);
-	border-color: var(--border);
+.tab-btn:hover {
 	color: var(--text-primary);
-	font-weight: 600;
-	box-shadow: 0 1px 0 rgba(255, 255, 255, 0.03) inset;
 }
-
-/* --- Main content -------------------------------------------------------- */
-
+.tab-btn.active {
+	border-bottom-color: var(--accent);
+	color: var(--text-primary);
+}
 .info-content {
+	grid-column: 2;
+	min-width: 0;
 	min-height: 18rem;
 }
-
-/* --- Footer --------------------------------------------------------------- */
-
 .site-footer {
 	width: 100%;
 	max-width: var(--content-width);
 	display: flex;
-	align-items: center;
 	justify-content: space-between;
 	gap: 1rem;
-	padding: 1.25rem 0 1.75rem;
+	padding: 1.5rem 0 2rem;
 	border-top: 1px solid var(--border);
 	font-size: 0.75rem;
 	color: var(--text-tertiary);
 }
-
-.site-footer .footer-meta {
-	font-family: var(--font-mono);
-	font-size: 0.6875rem;
+@media (max-width: 1000px) {
+	.container {
+		grid-template-columns: 15rem minmax(0, 1fr);
+		column-gap: 3rem;
+	}
+}
+@media (max-width: 800px) {
+	.container {
+		display: flex;
+		flex-direction: column;
+		padding: 3rem 0;
+		gap: 2.5rem;
+	}
+	.site-header {
+		position: static;
+	}
+}
+@media (max-width: 480px) {
+	.app-shell {
+		padding: 0 1.25rem;
+	}
+	.container {
+		padding: 2rem 0;
+	}
+	.tab-nav {
+		justify-content: space-between;
+		gap: 0.75rem;
+	}
+	.tab-btn {
+		font-size: 0.875rem;
+	}
+	.site-footer {
+		flex-direction: column;
+	}
 }
