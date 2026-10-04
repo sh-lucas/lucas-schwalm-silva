@@ -10,13 +10,17 @@ import {
 	TARGET_CASH,
 	TARGET_SERVED,
 } from '../../server/cafe-model'
+import {
+	type CafeJob,
+	type CafeRequest,
+	JOBS_KEY,
+	deliveryCost,
+	deliverySeconds,
+	prepSeconds,
+	restoreJobs,
+	secondsLeft,
+} from '../cafe-timing'
 
-type Pending = {
-	action: Action
-	requestId: string
-	slot?: number
-	index?: number
-}
 const resourceNames = {
 	cash: 'credits',
 	beans: 'coffee',
@@ -31,6 +35,7 @@ const labels = {
 	won: 'Target reached',
 	lost: 'Target missed',
 	expired: 'Time expired',
+	finished: 'Rush finished',
 }
 const date = (value: string) =>
 	new Date(value).toLocaleString([], {
@@ -49,79 +54,66 @@ export function CafeSection() {
 	const [loading, setLoading] = useState(true)
 	const [error, setError] = useState('')
 	const [attempts, setAttempts] = useState<Attempt[]>([])
-	const [pending, setPending] = useState<Pending | null>(null)
+	const [pending, setPending] = useState<CafeRequest | null>(null)
+	const [jobs, setJobs] = useState<CafeJob[]>([])
 	const [now, setNow] = useState(0)
 	const busy = useRef(false)
 	const mounted = useRef(true)
 	const clockOffset = useRef(0)
+	const shift = useRef('')
+	const jobsRef = useRef<CafeJob[]>([])
 
-	const apply = useCallback((data: CafeResponse) => {
-		setState(data.state)
-		setRecent(data.recent)
-		clockOffset.current = Date.parse(data.server_now) - Date.now()
-		setNow(Date.now() + clockOffset.current)
+	const saveJobs = useCallback((next: CafeJob[]) => {
+		jobsRef.current = next
+		setJobs(next)
+		try {
+			localStorage.setItem(
+				JOBS_KEY,
+				JSON.stringify({ shift: shift.current, jobs: next }),
+			)
+		} catch {
+			setError(
+				'This browser could not save the timers. Keep this tab open during the shift.',
+			)
+		}
 	}, [])
 
-	useEffect(() => {
-		mounted.current = true
-		const controller = new AbortController()
-		fetch('/api/cafe', { signal: controller.signal })
-			.then(async (res) => {
-				const data: CafeResponse = await res.json()
-				if (!res.ok) throw new Error(data.error)
-				if (mounted.current) apply(data)
-			})
-			.catch((err) => {
-				if (!controller.signal.aborted && mounted.current)
-					setError(err.message || 'Could not load the counter.')
-			})
-			.finally(() => {
-				if (!controller.signal.aborted && mounted.current) setLoading(false)
-			})
-		const clock = setInterval(
-			() => setNow(Date.now() + clockOffset.current),
-			1000,
-		)
-		return () => {
-			mounted.current = false
-			controller.abort()
-			clearInterval(clock)
-		}
-	}, [apply])
-
-	useEffect(() => {
-		const controller = new AbortController()
-		const poll = setInterval(async () => {
-			if (busy.current) return
-			busy.current = true
-			setLoading(true)
-			try {
-				const res = await fetch('/api/cafe', { signal: controller.signal })
-				const data: CafeResponse = await res.json()
-				if (!res.ok) throw new Error(data.error)
-				if (mounted.current) {
-					apply(data)
-					setError('')
-				}
-			} catch (err) {
-				if (!controller.signal.aborted && mounted.current)
-					setError(
-						err instanceof Error
-							? err.message
-							: 'Could not refresh the ledger.',
+	const apply = useCallback(
+		(data: CafeResponse) => {
+			setState(data.state)
+			setRecent(data.recent)
+			clockOffset.current = Date.parse(data.server_now) - Date.now()
+			setNow(Date.now() + clockOffset.current)
+			if (!data.state) return
+			let next = jobsRef.current
+			if (shift.current !== data.state.shift) {
+				shift.current = data.state.shift
+				try {
+					next = restoreJobs(localStorage.getItem(JOBS_KEY), data.state).map(
+						(job) => ({ ...job, failed: job.failed || job.submitted }),
 					)
-			} finally {
-				busy.current = false
-				if (!controller.signal.aborted && mounted.current) setLoading(false)
+				} catch {
+					next = []
+				}
 			}
-		}, 15000)
-		return () => {
-			clearInterval(poll)
-			controller.abort()
-		}
-	}, [apply])
+			const current = data.state
+			next = next.filter((job) => {
+				const committed = current.history.some(
+					(tx) => tx.request_id === job.requestId,
+				)
+				return !committed && (current.status === 'active' || job.submitted)
+			})
+			saveJobs(next)
+			setPending((previous) =>
+				previous?.action === 'start'
+					? previous
+					: (next.find((job) => job.failed) ?? null),
+			)
+		},
+		[saveJobs],
+	)
 
-	async function refresh() {
+	const refresh = useCallback(async () => {
 		if (busy.current) return
 		busy.current = true
 		setLoading(true)
@@ -142,55 +134,119 @@ export function CafeSection() {
 			busy.current = false
 			if (mounted.current) setLoading(false)
 		}
-	}
+	}, [apply])
 
-	async function act(action: Action, offer?: Offer, retry?: Pending) {
-		if (busy.current) return
-		const request = retry ?? {
-			action,
-			requestId: crypto.randomUUID(),
-			...(offer ? { slot: offer.slot, index: offer.index } : {}),
+	useEffect(() => {
+		mounted.current = true
+		void refresh()
+		const poll = setInterval(refresh, 15000)
+		const clock = setInterval(
+			() => setNow(Date.now() + clockOffset.current),
+			250,
+		)
+		return () => {
+			mounted.current = false
+			clearInterval(poll)
+			clearInterval(clock)
 		}
-		busy.current = true
-		setLoading(true)
-		setError('')
-		setAttempts([])
-		setPending(request)
-		try {
-			const res = await fetch('/api/cafe', {
-				method: 'POST',
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify(request),
-			})
-			const data: CafeResponse = await res.json()
-			if (!mounted.current) return
-			if (!res.ok) {
-				setPending(data.retryable ? request : null)
-				throw new Error(data.error)
+	}, [refresh])
+
+	const act = useCallback(
+		async (action: Action, offer?: Offer, retry?: CafeRequest) => {
+			if (busy.current) return
+			const request = retry ?? {
+				action,
+				requestId: crypto.randomUUID(),
+				...(offer ? { slot: offer.slot, index: offer.index } : {}),
 			}
-			apply(data)
-			setAttempts(data.attempts ?? [])
-			setPending(data.retryable ? request : null)
-		} catch (err) {
-			if (mounted.current)
-				setError(
-					err instanceof Error
-						? err.message
-						: 'Connection interrupted. Retry the same request.',
-				)
-		} finally {
-			busy.current = false
-			if (mounted.current) setLoading(false)
-		}
-	}
+			busy.current = true
+			setLoading(true)
+			setError('')
+			setAttempts([])
+			setPending(request)
+			saveJobs(
+				jobsRef.current.map((job) =>
+					job.requestId === request.requestId
+						? { ...job, submitted: true, failed: false }
+						: job,
+				),
+			)
+			let retryable = true
+			try {
+				const res = await fetch('/api/cafe', {
+					method: 'POST',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify(request),
+				})
+				const data: CafeResponse = await res.json()
+				if (!mounted.current) return
+				if (!res.ok) {
+					retryable = !!data.retryable
+					throw new Error(data.error)
+				}
+				apply(data)
+				setAttempts(data.attempts ?? [])
+				if (!data.retryable) {
+					saveJobs(
+						jobsRef.current.filter(
+							(job) => job.requestId !== request.requestId,
+						),
+					)
+					setPending(null)
+				} else {
+					saveJobs(
+						jobsRef.current.map((job) =>
+							job.requestId === request.requestId
+								? { ...job, failed: true }
+								: job,
+						),
+					)
+					setPending(request)
+				}
+			} catch (err) {
+				if (mounted.current) {
+					saveJobs(
+						retryable
+							? jobsRef.current.map((job) =>
+									job.requestId === request.requestId
+										? { ...job, failed: true }
+										: job,
+								)
+							: jobsRef.current.filter(
+									(job) => job.requestId !== request.requestId,
+								),
+					)
+					setPending(retryable ? request : null)
+					setError(
+						err instanceof Error
+							? err.message
+							: 'Connection interrupted. Retry the same request.',
+					)
+				}
+			} finally {
+				busy.current = false
+				if (mounted.current) setLoading(false)
+			}
+		},
+		[apply, saveJobs],
+	)
 
 	const remaining = state
 		? Math.max(0, Math.ceil((Date.parse(state.expires_at) - now) / 1000))
 		: 0
 	const status =
-		state?.status === 'active' && remaining === 0 ? 'expired' : state?.status
+		state?.status === 'active' && remaining === 0
+			? state.mode === 'rush'
+				? 'finished'
+				: 'expired'
+			: state?.status
 	const active = status === 'active'
 	const disabled = loading || !!pending || !active
+	const brewing = jobs.find(
+		(job) => job.action === 'serve' || job.action === 'race',
+	)
+	const heldCash = jobs.reduce((total, job) => total + deliveryCost(job), 0)
+	const spendable = (state?.cash ?? 0) - heldCash
 	const canServe = (offer: Offer) =>
 		!!state &&
 		state.balances.beans >= offer.beans &&
@@ -203,6 +259,54 @@ export function CafeSection() {
 			.join(' and ')
 	}
 
+	function queue(action: Exclude<Action, 'start'>, offer?: Offer) {
+		if (busy.current || pending || !active || !state) return
+		const next = jobsRef.current
+		if (action === 'coffee' || action === 'milk') {
+			const cost = action === 'coffee' ? 7 : 5
+			if (
+				next.some((job) => job.action === action) ||
+				state.cash - next.reduce((total, job) => total + deliveryCost(job), 0) <
+					cost
+			)
+				return
+		} else {
+			if (
+				!offer ||
+				next.some((job) => job.slot === offer.slot) ||
+				(action !== 'discard' &&
+					next.some((job) => job.action === 'serve' || job.action === 'race'))
+			)
+				return
+		}
+		const duration =
+			action === 'coffee' || action === 'milk'
+				? deliverySeconds(state.balances.moves, action)
+				: action === 'discard'
+					? 0
+					: prepSeconds(offer as Offer)
+		if (now + duration * 1000 >= Date.parse(state.expires_at)) {
+			setError('Not enough time left for that to finish. Try a quicker order.')
+			return
+		}
+		saveJobs([
+			...next,
+			{
+				action,
+				requestId: crypto.randomUUID(),
+				started: now,
+				ready: now + duration * 1000,
+				...(offer ? { slot: offer.slot, index: offer.index } : {}),
+			},
+		])
+	}
+
+	useEffect(() => {
+		if (disabled) return
+		const ready = jobs.find((job) => !job.failed && job.ready <= now)
+		if (ready) void act(ready.action, undefined, ready)
+	}, [act, disabled, jobs, now])
+
 	return (
 		<section className="cafe fade-in" aria-labelledby="cafe-title">
 			<div className="cafe-intro">
@@ -213,10 +317,10 @@ export function CafeSection() {
 					<em>night shift.</em>
 				</h2>
 				<p>
-					Three orders on the counter. Twelve decisions. Serve at least{' '}
-					{TARGET_SERVED} and finish with {TARGET_CASH} credits before your 15
-					minutes run out. Choose what to brew, what to pass on and when to
-					restock.
+					Two minutes. Three orders. One coffee machine. Keep as many credits as
+					you can before time runs out or you use all twelve decisions. Brew
+					something quick, wait for a bigger payout, or pass on a costly order
+					while your supplies are on the way.
 				</p>
 			</div>
 
@@ -229,9 +333,10 @@ export function CafeSection() {
 					<div>
 						<h3>Your counter is waiting.</h3>
 						<p>
-							Start with 20 credits, 4 coffee and 2 milk. Coffee deliveries cost
-							7 for 3 portions; milk costs 5 for 3. Every discard uses one of
-							your twelve decisions.
+							Start with 20 credits, 4 coffee and 2 milk. Brewing takes 1, 3 or
+							5 seconds. Deliveries take 6–12 seconds and run alongside the
+							machine. Passing on an order saves ingredients, but spends a
+							decision without earning anything.
 						</p>
 						<button
 							className="action-button"
@@ -263,6 +368,8 @@ export function CafeSection() {
 							</span>
 							<p>
 								{state.served} served · {state.discarded} discarded
+								{state.mode === 'classic' &&
+									` · Original shift: ${TARGET_SERVED} served / ${TARGET_CASH} credits target`}
 							</p>
 						</div>
 					</div>
@@ -288,6 +395,11 @@ export function CafeSection() {
 											: `${resource === 'beans' ? '/ 10' : '/ 8'} portions`}
 									</small>
 								</strong>
+								{resource === 'cash' && heldCash > 0 && active && (
+									<p className="cafe-rule-note">
+										{heldCash} held for deliveries · {spendable} available
+									</p>
+								)}
 							</div>
 						))}
 					</div>
@@ -297,8 +409,9 @@ export function CafeSection() {
 								<div>
 									<h3>Keep an eye on the pantry.</h3>
 									<p>
-										Buy only what you need. A delivery doesn’t use a decision,
-										but it spends your earnings and needs space on the shelf.
+										Order ahead: deliveries take 6–12 seconds. Keep brewing
+										while you wait. Credits are held now; payment and stock
+										arrive together when the delivery finishes.
 									</p>
 								</div>
 								<div className="supply-actions">
@@ -306,24 +419,63 @@ export function CafeSection() {
 										className="text-button"
 										type="button"
 										disabled={
-											disabled || state.cash < 7 || state.balances.beans > 7
+											disabled ||
+											spendable < 7 ||
+											state.balances.beans > 7 ||
+											jobs.some((job) => job.action === 'coffee')
 										}
-										onClick={() => act('coffee')}
+										onClick={() => queue('coffee')}
 									>
-										Buy 3 coffee · 7 credits
+										Buy 3 coffee · 7 credits ·{' '}
+										{deliverySeconds(state.balances.moves, 'coffee')}s
 									</button>
 									<button
 										className="text-button"
 										type="button"
 										disabled={
-											disabled || state.cash < 5 || state.balances.milk > 5
+											disabled ||
+											spendable < 5 ||
+											state.balances.milk > 5 ||
+											jobs.some((job) => job.action === 'milk')
 										}
-										onClick={() => act('milk')}
+										onClick={() => queue('milk')}
 									>
-										Buy 3 milk · 5 credits
+										Buy 3 milk · 5 credits ·{' '}
+										{deliverySeconds(state.balances.moves, 'milk')}s
 									</button>
 								</div>
 							</div>
+							{jobs.some((job) => deliveryCost(job)) && (
+								<div className="delivery-grid" aria-label="Incoming supplies">
+									{jobs
+										.filter((job) => deliveryCost(job))
+										.map((job) => (
+											<div className="cafe-timed-task" key={job.requestId}>
+												<div>
+													<span>
+														3 {job.action === 'coffee' ? 'coffee' : 'milk'} on
+														the way
+													</span>
+													<strong>
+														{job.failed
+															? 'Needs confirmation'
+															: secondsLeft(job, now)
+																? `${secondsLeft(job, now)}s`
+																: 'Receiving…'}
+													</strong>
+												</div>
+												<progress
+													aria-label={`${job.action} delivery progress`}
+													max={job.ready - job.started}
+													value={Math.min(
+														job.ready - job.started,
+														Math.max(0, now - job.started),
+													)}
+												/>
+											</div>
+										))}
+								</div>
+							)}
 							<div className="order-grid" aria-label="Choose an order">
 								{state.offers.map((offer) => (
 									<article
@@ -336,6 +488,9 @@ export function CafeSection() {
 											{offer.beans} coffee
 											{offer.milk ? ` + ${offer.milk} milk` : ''}
 										</p>
+										<p className="order-time">
+											{prepSeconds(offer)}s at the machine · uses 1 decision
+										</p>
 										<strong className="order-price">
 											+{offer.price} <small>credits</small>
 										</strong>
@@ -343,20 +498,56 @@ export function CafeSection() {
 											<button
 												className="action-button"
 												type="button"
-												disabled={disabled || !canServe(offer)}
-												onClick={() => act('serve', offer)}
+												disabled={
+													disabled ||
+													!!brewing ||
+													!canServe(offer) ||
+													jobs.some((job) => job.slot === offer.slot)
+												}
+												onClick={() => queue('serve', offer)}
 											>
-												Serve
+												Brew & serve
 											</button>
 											<button
 												className="text-button"
 												type="button"
-												disabled={disabled}
-												onClick={() => act('discard', offer)}
+												disabled={
+													disabled ||
+													jobs.some((job) => job.slot === offer.slot)
+												}
+												onClick={() => queue('discard', offer)}
 											>
 												Discard
 											</button>
 										</div>
+										{brewing?.slot === offer.slot ? (
+											<div className="cafe-timed-task">
+												<div>
+													<span>
+														{brewing.failed
+															? 'Check the receipt'
+															: secondsLeft(brewing, now)
+																? 'Brewing'
+																: 'Serving…'}
+													</span>
+													<strong>{secondsLeft(brewing, now)}s</strong>
+												</div>
+												<progress
+													aria-label="Brewing progress"
+													max={brewing.ready - brewing.started}
+													value={Math.min(
+														brewing.ready - brewing.started,
+														Math.max(0, now - brewing.started),
+													)}
+												/>
+											</div>
+										) : (
+											brewing && (
+												<p className="order-time">
+													Machine busy at counter {(brewing.slot ?? 0) + 1}.
+												</p>
+											)
+										)}
 										{!canServe(offer) && (
 											<p className="order-shortage">Need {shortage(offer)}.</p>
 										)}
@@ -364,8 +555,10 @@ export function CafeSection() {
 								))}
 							</div>
 							<p className="cafe-rule-note">
-								Serving or discarding replaces that ticket with a new one. You
-								can discard at most four and still reach eight served orders.
+								A longer brew ties up the machine. Passing on an order brings a
+								new offer immediately and saves stock, but earns nothing and
+								uses one of your twelve decisions. Unfinished brews and
+								deliveries are cancelled when the counter closes.
 							</p>
 							<details className="cafe-experiment">
 								<summary>Try two requests for one order</summary>
@@ -379,8 +572,13 @@ export function CafeSection() {
 											className="text-button"
 											key={offer.slot}
 											type="button"
-											disabled={disabled || !canServe(offer)}
-											onClick={() => act('race', offer)}
+											disabled={
+												disabled ||
+												!!brewing ||
+												!canServe(offer) ||
+												jobs.some((job) => job.slot === offer.slot)
+											}
+											onClick={() => queue('race', offer)}
 										>
 											Try counter {offer.slot + 1}
 										</button>
@@ -393,16 +591,20 @@ export function CafeSection() {
 							<div>
 								<p className="section-kicker">{labels[status ?? 'expired']}</p>
 								<h3>
-									{status === 'won'
-										? 'A good night’s work.'
-										: status === 'expired'
-											? 'Time to close the counter.'
-											: 'That shift didn’t quite pay off.'}
+									{status === 'finished'
+										? `${state.cash} credits in the till.`
+										: status === 'won'
+											? 'A good night’s work.'
+											: status === 'expired'
+												? 'Time to close the counter.'
+												: 'That shift didn’t quite pay off.'}
 								</h3>
 								<p>
 									{state.served} orders served, {state.discarded} passed on,{' '}
 									{state.cash} credits left. Your receipt is saved in the
 									ledger.
+									{state.mode === 'rush' &&
+										` That’s ${state.cash >= 20 ? '+' : ''}${state.cash - 20} against your starting till.`}
 									{status === 'expired'
 										? ' Orders and deliveries are locked after the deadline, even if you closed this tab.'
 										: ''}
@@ -477,7 +679,7 @@ export function CafeSection() {
 				{error && <p role="alert">{error}</p>}
 				{loading && state && <p>Checking the ledger…</p>}
 			</div>
-			{pending && (
+			{pending && !loading && (
 				<button
 					className="text-button"
 					type="button"
@@ -503,20 +705,24 @@ export function CafeSection() {
 					<span className="section-head-meta">everyone’s counter</span>
 				</div>
 				<p className="cafe-rule-note">
-					The six most recently opened rounds. Unfinished rounds expire
-					automatically after 15 minutes.
+					The six most recently opened rounds. Rushes close after two minutes or
+					twelve decisions; original shifts keep their 15-minute deadline.
 				</p>
 				{recent.length ? (
 					<ol>
 						{recent.map((round) => {
 							const publicStatus =
 								round.status === 'active' && now >= Date.parse(round.expires_at)
-									? 'expired'
+									? round.mode === 'rush'
+										? 'finished'
+										: 'expired'
 									: round.status
 							return (
 								<li key={round.shift}>
 									<div>
-										<strong>Shift {round.shift}</strong>
+										<strong>
+											{round.mode === 'rush' ? 'Rush' : 'Shift'} {round.shift}
+										</strong>
 										<time dateTime={round.started_at}>
 											{date(round.started_at)}
 										</time>
@@ -548,8 +754,7 @@ export function CafeSection() {
 				)}
 			</section>
 			<p className="cafe-credit">
-				Stock, credits, single-use tickets and the 15-minute deadline are
-				guarded by{' '}
+				Stock, credits and single-use tickets are guarded by{' '}
 				<a
 					href="https://about.plinth.sh-lucas.dev"
 					target="_blank"

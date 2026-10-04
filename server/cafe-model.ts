@@ -8,6 +8,7 @@ export const RECIPES = [
 ] as const
 export const ROOT = 'portfolio-cafe-v2'
 export const ROUND_SECONDS = 15 * 60
+export const RUSH_SECONDS = 2 * 60
 export const MAX_DECISIONS = 12
 export const TARGET_CASH = 50
 export const TARGET_SERVED = 8
@@ -30,7 +31,7 @@ export const ACTIONS: Action[] = [
 	'milk',
 	'race',
 ]
-export type RoundStatus = 'active' | 'won' | 'lost' | 'expired'
+export type RoundStatus = 'active' | 'won' | 'lost' | 'expired' | 'finished'
 export interface Offer {
 	slot: number
 	index: number
@@ -42,6 +43,7 @@ export interface Offer {
 }
 export interface RoundSummary {
 	shift: string
+	mode: 'classic' | 'rush'
 	started_at: string
 	expires_at: string
 	ended_at: string | null
@@ -55,6 +57,7 @@ export interface CafeState extends RoundSummary {
 	offers: Offer[]
 	history: {
 		id: string
+		request_id?: string
 		memo: string
 		created_at: string
 		postings: { resource: Resource; amount: number }[]
@@ -80,7 +83,10 @@ export function roundStatus(
 	cash: number,
 	deadline: number,
 	now: number,
+	rush = false,
 ): RoundStatus {
+	if (rush)
+		return moves >= MAX_DECISIONS || now >= deadline ? 'finished' : 'active'
 	if (moves >= MAX_DECISIONS)
 		return served >= TARGET_SERVED && cash >= TARGET_CASH ? 'won' : 'lost'
 	return now >= deadline ? 'expired' : 'active'
@@ -366,7 +372,11 @@ export function template(
 	}
 }
 
-export function openingOperations(shift: string, offers: Offer[]) {
+export function openingOperations(
+	shift: string,
+	offers: Offer[],
+	rush = false,
+) {
 	const refs = bucketRefs(shift)
 	const context = { domain: ROOT }
 	const referenceInputs = (resources: string[]) =>
@@ -386,7 +396,10 @@ export function openingOperations(shift: string, offers: Offer[]) {
 			template: `${ROOT}-start`,
 			context,
 			inputs: referenceInputs(['journal', 'cash', 'beans', 'milk']),
-			memo: 'Opened the counter: 20 credits, 4 coffee, 2 milk. Deadline: 15 minutes.',
+			memo: rush
+				? 'Opened the two-minute rush: 20 credits, 4 coffee, 2 milk.'
+				: 'Opened the counter: 20 credits, 4 coffee, 2 milk. Deadline: 15 minutes.',
+			...(rush ? { metadata: { game: 'rush-v1' } } : {}),
 		},
 		{
 			template: `${ROOT}-counters`,
@@ -395,7 +408,9 @@ export function openingOperations(shift: string, offers: Offer[]) {
 				...referenceInputs(['served', 'discarded', 'moves']),
 				journal: refs.journal,
 			},
-			memo: 'Twelve opportunities to serve at least eight orders.',
+			memo: rush
+				? 'Twelve decisions. Keep as many credits as you can.'
+				: 'Twelve opportunities to serve at least eight orders.',
 		},
 		{
 			template: `${ROOT}-offers`,

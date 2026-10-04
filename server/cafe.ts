@@ -6,6 +6,7 @@ import {
 	RECIPES,
 	RESOURCES,
 	ROOT,
+	RUSH_SECONDS,
 	type Resource,
 	type RoundSummary,
 	bucketRefs,
@@ -41,6 +42,7 @@ async function plinth<T = unknown>(
 	body?: unknown,
 	key?: string,
 	retry = true,
+	submitBy = Number.POSITIVE_INFINITY,
 ): Promise<T> {
 	if (!env.PLINTH_EMAIL || !env.PLINTH_PASSWORD)
 		throw new ApiError(
@@ -73,6 +75,8 @@ async function plinth<T = unknown>(
 			password: env.PLINTH_PASSWORD,
 		}
 	}
+	if (Date.now() >= submitBy)
+		throw new ApiError(422, 'The two-minute rush has ended. Open a new shift.')
 	const response = await fetch(`${API}${path}`, {
 		method: body === undefined ? 'GET' : 'POST',
 		headers: {
@@ -85,7 +89,7 @@ async function plinth<T = unknown>(
 	})
 	if (response.status === 401 && retry) {
 		session = undefined
-		return plinth<T>(env, path, body, key, false)
+		return plinth<T>(env, path, body, key, false, submitBy)
 	}
 	const data = await response.json()
 	if (!response.ok)
@@ -124,7 +128,12 @@ interface Transaction {
 	memo?: string
 	created_at: string
 	inputs: Record<string, string | number>
-	metadata?: { slot?: number; index?: number }
+	metadata?: {
+		slot?: number
+		index?: number
+		game?: string
+		request_id?: string
+	}
 	postings: { bucket: string; amount: number; sequence: number }[]
 }
 function persistedOffer(
@@ -146,6 +155,7 @@ function persistedOffer(
 }
 const summary = ({
 	shift,
+	mode,
 	started_at,
 	expires_at,
 	ended_at,
@@ -155,6 +165,7 @@ const summary = ({
 	discarded,
 }: CafeState): RoundSummary => ({
 	shift,
+	mode,
 	started_at,
 	expires_at,
 	ended_at,
@@ -219,27 +230,33 @@ async function readState(
 			finishedAt = tx.created_at
 		return {
 			id: tx.id,
+			request_id: tx.metadata?.request_id,
 			memo: tx.memo ?? 'Ledger operation',
 			created_at: tx.created_at,
 			postings: postings.filter((p) => p.resource !== 'journal'),
 		}
 	})
 	// The deadline is an immutable attribute computed by Plinth's server clock.
-	const deadline = attributes.deadline * 1000
+	const rush = opening.metadata?.game === 'rush-v1'
+	const deadline = rush
+		? Math.min(attributes.deadline, attributes.started_at + RUSH_SECONDS) * 1000
+		: attributes.deadline * 1000
 	const status = roundStatus(
 		balances.moves,
 		balances.served,
 		balances.cash,
 		deadline,
 		now,
+		rush,
 	)
 	return {
 		shift: shift.slice(0, 8),
+		mode: rush ? 'rush' : 'classic',
 		started_at: opening.created_at,
 		expires_at: new Date(deadline).toISOString(),
 		ended_at:
 			finishedAt ??
-			(status === 'expired' ? new Date(deadline).toISOString() : null),
+			(status !== 'active' ? new Date(deadline).toISOString() : null),
 		status,
 		cash: balances.cash,
 		served: balances.served,
@@ -279,6 +296,7 @@ async function execute(
 	slot: number,
 	index: number,
 	key: string,
+	deadline = Number.POSITIVE_INFINITY,
 ) {
 	const inputs: Record<string, string | number> = bucketRefs(shift)
 	let memo: string
@@ -303,11 +321,14 @@ async function execute(
 			context: { domain: ROOT },
 			inputs,
 			memo,
-			...(action === 'serve' || action === 'discard'
-				? { metadata: { slot, index } }
-				: {}),
+			metadata: {
+				request_id: key,
+				...(action === 'serve' || action === 'discard' ? { slot, index } : {}),
+			},
 		},
 		`cafe2:${shift}:${key}`,
+		true,
+		deadline,
 	)
 }
 
@@ -330,7 +351,7 @@ export async function handleCafe(
 		return reply({
 			state,
 			recent,
-			server_now: new Date(now).toISOString(),
+			server_now: new Date().toISOString(),
 			...extra,
 		})
 	}
@@ -382,7 +403,7 @@ export async function handleCafe(
 				await plinth(
 					env,
 					'/transactions/batch',
-					{ operations: openingOperations(newShift, offers) },
+					{ operations: openingOperations(newShift, offers, true) },
 					`cafe2:${newShift}:open`,
 				)
 			} catch (error) {
@@ -418,6 +439,36 @@ export async function handleCafe(
 			throw new ApiError(400, 'Invalid order selection.')
 		const selectedSlot = typeof slot === 'number' ? slot : 0
 		const selectedIndex = typeof index === 'number' ? index : 0
+		const current = await readState(env, shift)
+		// Recover committed retries even after closure; never apply a new late action.
+		const deadline =
+			current.mode === 'rush'
+				? Date.parse(current.expires_at)
+				: Number.POSITIVE_INFINITY
+		if (
+			current.mode === 'rush' &&
+			(current.status !== 'active' || Date.now() >= deadline)
+		) {
+			if (body.action === 'race') {
+				const attempts = [0, 1].map((n) => {
+					const committed = current.history.some(
+						(tx) => tx.request_id === `${body.requestId}:${n}`,
+					)
+					return {
+						request: n + 1,
+						committed,
+						message: committed ? 'Committed' : 'Not committed before closure',
+					}
+				})
+				if (attempts.some((attempt) => attempt.committed))
+					return await result(shift, { attempts })
+			} else if (current.history.some((tx) => tx.request_id === body.requestId))
+				return await result(shift)
+			throw new ApiError(
+				422,
+				'The two-minute rush has ended. Open a new shift.',
+			)
+		}
 		if (body.action === 'race') {
 			const results = await Promise.allSettled(
 				[0, 1].map((n) =>
@@ -428,6 +479,7 @@ export async function handleCafe(
 						selectedSlot,
 						selectedIndex,
 						`${body.requestId}:${n}`,
+						deadline,
 					),
 				),
 			)
@@ -459,6 +511,7 @@ export async function handleCafe(
 			selectedSlot,
 			selectedIndex,
 			body.requestId,
+			deadline,
 		)
 		return await result(shift)
 	} catch (error) {

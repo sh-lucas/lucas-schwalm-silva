@@ -7,10 +7,10 @@ import {
 	MAX_DECISIONS,
 	type Offer,
 	ROOT,
+	RUSH_SECONDS,
 	drawOffer,
 	openingOperations,
 	roundStatus,
-	template,
 } from '../server/cafe-model'
 
 async function check() {
@@ -57,6 +57,9 @@ async function check() {
 	assert.equal(roundStatus(0, 0, 20, 1000, 1000), 'expired')
 	assert.equal(roundStatus(12, 8, 50, 1000, 2000), 'won')
 	assert.equal(roundStatus(12, 7, 100, 1000, 2000), 'lost')
+	assert.equal(roundStatus(0, 0, 20, 1000, 999, true), 'active')
+	assert.equal(roundStatus(0, 0, 20, 1000, 1000, true), 'finished')
+	assert.equal(roundStatus(12, 0, 20, 1000, 999, true), 'finished')
 	await call(request('start'), 403, 'https://another-site.example')
 	await call({ action: 'start', requestId: 'invalid' }, 400)
 	const opening = request('start')
@@ -79,8 +82,9 @@ async function check() {
 	assert.equal(
 		Date.parse(state.expires_at) -
 			Math.floor(Date.parse(state.started_at) / 1000) * 1000,
-		900000,
+		RUSH_SECONDS * 1000,
 	)
+	assert.equal(state.mode, 'rush')
 	assert.equal(
 		(await call()).recent[0].shift,
 		state.shift,
@@ -164,7 +168,7 @@ async function check() {
 	assert.equal(state.served, 11)
 	assert.equal(state.discarded, 1)
 	assert.ok(state.cash >= 50)
-	assert.equal(state.status, 'won')
+	assert.equal(state.status, 'finished')
 	await call(request('serve', state.offers[0]), 422)
 	await call(request('coffee'), 422)
 	assert.deepEqual(
@@ -173,7 +177,38 @@ async function check() {
 		'Reload must restore a complete round',
 	)
 	const finishedCookie = cookie
+	assert.deepEqual(
+		stateOf(await call(discarded)),
+		state,
+		'A committed retry must remain safe after closure',
+	)
+	assert.deepEqual(
+		stateOf(await call(race)),
+		state,
+		'A race retry must remain safe after closure',
+	)
+	const originalNow = Date.now
+	try {
+		Date.now = () => originalNow() + RUSH_SECONDS * 1000 + 1000
+		state = stateOf(await call())
+		assert.deepEqual(stateOf(await call(discarded)), state)
+		await call(request('coffee'), 422)
+	} finally {
+		Date.now = originalNow
+	}
 	for (let n = 0; n < 6; n++) await call(request('start'))
+	const active = stateOf(await call())
+	try {
+		Date.now = () => originalNow() + RUSH_SECONDS * 1000 + 1000
+		const timedOut = stateOf(await call())
+		assert.equal(timedOut.status, 'finished')
+		assert.equal(timedOut.ended_at, timedOut.expires_at)
+		for (const action of ['serve', 'discard', 'race', 'coffee', 'milk'])
+			await call(request(action, active.offers[0]), 422)
+		assert.equal(stateOf(await call()).history.length, active.history.length)
+	} finally {
+		Date.now = originalNow
+	}
 	const recent = (await call()).recent
 	assert.equal(recent.length, 6)
 	assert.ok(
@@ -214,21 +249,18 @@ async function check() {
 		})
 		assert.ok(res.ok, `${path}: ${res.status} ${await res.text()}`)
 	}
-	const expiredTemplate = template('start')
-	expiredTemplate.id = `${ROOT}-expiry-check`
-	for (const node of expiredTemplate.nodes)
-		if (node.id === 'duration') node.value = 0
-	await api('/templates', expiredTemplate)
+	// Reuse the existing clock fixture; this check does not publish templates.
 	const expiredId = crypto.randomUUID()
 	const offers = await Promise.all(
 		[0, 1, 2].map((slot) => drawOffer(expiredId, slot, 0)),
 	)
 	const operations = openingOperations(expiredId, offers)
-	operations[0].template = expiredTemplate.id
+	operations[0].template = `${ROOT}-expiry-check`
 	await api('/transactions/batch', { operations }, `cafe2:${expiredId}:open`)
 	cookie = `cafe_shift_v2=${expiredId}`
 	const expired = stateOf(await call())
 	assert.equal(expired.status, 'expired')
+	assert.equal(expired.mode, 'classic')
 	await call(
 		{
 			...request('serve', expired.offers[0]),
@@ -246,7 +278,7 @@ async function check() {
 		'Expired rounds must remain unchanged for every action',
 	)
 	console.log(
-		'Passed against real Plinth: three persistent choices, atomic opening and retries, single-use tickets, discard, pantry capacity, complete game, newest six public rounds, and server-clock expiry for every action.',
+		'Passed against real Plinth: rush metadata and two-minute expiry, closed-round retries, three persistent choices, atomic opening, single-use tickets, pantry capacity, twelve-decision closure, newest six public rounds, and original server-clock expiry. No templates published.',
 	)
 }
 check().catch((error) => {

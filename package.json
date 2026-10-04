@@ -7,7 +7,8 @@
 		"build": "tsc && vite build && tsx scripts/prerender.ts",
 		"preview": "vite preview",
 		"cafe:setup": "tsx scripts/setup-cafe.ts",
-		"cafe:check": "tsx scripts/check-cafe.ts"
+		"cafe:check": "tsx scripts/check-cafe.ts",
+		"cafe:timing-check": "tsx scripts/check-cafe-timing.ts"
 	},
 	"dependencies": {
 		"react": "^18.3.1",
