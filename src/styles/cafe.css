@@ -322,3 +322,198 @@ button:disabled {
 .cafe-receipt :focus-visible {
 	outline-color: #302d26;
 }
+.shift-progress {
+	display: flex;
+	justify-content: space-between;
+	align-items: baseline;
+	flex-wrap: wrap;
+	gap: 1rem;
+}
+.shift-progress span {
+	font-size: 0.8125rem;
+	color: var(--text-secondary);
+}
+.shift-progress strong {
+	display: block;
+	font-size: 1.5rem;
+	font-weight: 500;
+	color: var(--accent);
+	font-variant-numeric: tabular-nums;
+}
+.shift-progress p {
+	font-size: 0.8125rem;
+	color: var(--text-tertiary);
+	margin-top: 0.35rem;
+}
+.cafe-supplies {
+	display: flex;
+	justify-content: space-between;
+	align-items: start;
+	flex-wrap: wrap;
+	gap: 0.75rem 1.5rem;
+}
+.cafe-supplies h3 {
+	font-size: 1rem;
+	font-weight: 600;
+}
+.cafe-supplies p {
+	max-width: 25rem;
+	font-size: 0.8125rem;
+	color: var(--text-secondary);
+	line-height: 1.8;
+	margin-top: 0.5rem;
+}
+.supply-actions {
+	display: flex;
+	flex-direction: column;
+}
+.order-grid {
+	display: grid;
+	grid-template-columns: repeat(3, minmax(0, 1fr));
+	gap: 0.875rem;
+}
+.order-ticket {
+	min-width: 0;
+	padding: 1.25rem;
+	border: 1px solid var(--border);
+	border-top: 2px solid var(--accent);
+	background: var(--surface);
+	display: flex;
+	flex-direction: column;
+}
+.order-ticket h3 {
+	font-size: 1.0625rem;
+	font-weight: 500;
+	line-height: 1.5;
+	letter-spacing: -0.025em;
+}
+.order-recipe {
+	font-size: 0.8125rem;
+	color: var(--text-secondary);
+	margin-top: 0.65rem;
+}
+.order-price {
+	display: block;
+	font-size: 1.75rem;
+	font-weight: 500;
+	font-variant-numeric: tabular-nums;
+	padding-top: 1.25rem;
+	margin-top: auto;
+}
+.order-price small {
+	font-size: 0.75rem;
+	font-weight: 400;
+	color: var(--text-tertiary);
+}
+.order-options {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.5rem 1rem;
+	align-items: center;
+	margin-top: 1rem;
+}
+.order-options .action-button {
+	padding: 0.6rem 0.9rem;
+}
+.order-shortage {
+	font-size: 0.75rem;
+	line-height: 1.7;
+	color: var(--status-warn);
+	margin-top: 0.75rem;
+}
+.cafe-rule-note {
+	font-size: 0.8125rem;
+	line-height: 1.8;
+	color: var(--text-tertiary);
+}
+.cafe-experiment {
+	display: block;
+	border-top: 1px solid var(--border);
+	padding-top: 1.25rem;
+}
+.cafe-experiment summary {
+	font-size: 0.875rem;
+	cursor: pointer;
+	color: var(--text-secondary);
+}
+.race-actions {
+	display: flex;
+	gap: 1.5rem;
+	flex-wrap: wrap;
+	margin-top: 0.5rem;
+}
+.recent-rounds {
+	border-top: 1px solid var(--border);
+	padding-top: 1.5rem;
+}
+.recent-rounds .section-head {
+	margin-bottom: 0.75rem;
+}
+.recent-rounds ol {
+	list-style: none;
+	margin-top: 1rem;
+}
+.recent-rounds li {
+	padding: 1rem 0;
+	border-bottom: 1px solid var(--border);
+}
+.recent-rounds li > div {
+	display: flex;
+	justify-content: space-between;
+	align-items: baseline;
+	flex-wrap: wrap;
+	gap: 0.5rem 1rem;
+	font-size: 0.8125rem;
+	color: var(--text-secondary);
+}
+.recent-rounds li > div + div {
+	margin-top: 0.5rem;
+}
+.recent-rounds strong {
+	font-weight: 500;
+	color: var(--text-primary);
+}
+.recent-rounds time,
+.recent-rounds small {
+	color: var(--text-tertiary);
+	font-size: 0.75rem;
+}
+.round-status[data-status="won"] {
+	color: var(--status-ok);
+}
+.round-status[data-status="expired"],
+.round-status[data-status="lost"] {
+	color: var(--status-warn);
+}
+@media (max-width: 1000px) and (min-width: 801px), (max-width: 560px) {
+	.order-grid {
+		grid-template-columns: 1fr;
+	}
+	.order-ticket {
+		display: grid;
+		grid-template-columns: minmax(0, 1fr) auto;
+		gap: 0.5rem 1rem;
+	}
+	.order-ticket .section-kicker {
+		grid-column: 1 / -1;
+		margin: 0;
+	}
+	.order-ticket h3 {
+		grid-column: 1;
+	}
+	.order-recipe {
+		grid-column: 1;
+		margin: 0;
+	}
+	.order-price {
+		grid-column: 2;
+		grid-row: 2 / span 2;
+		padding-top: 0;
+		margin: 0;
+		align-self: center;
+	}
+	.order-options,
+	.order-shortage {
+		grid-column: 1 / -1;
+	}
+}

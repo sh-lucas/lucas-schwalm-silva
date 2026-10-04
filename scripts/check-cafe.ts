@@ -1,12 +1,27 @@
 import assert from 'node:assert/strict'
 import { loadEnv } from 'vite'
 import { handleCafe } from '../server/cafe'
+import {
+	type CafeResponse,
+	type CafeState,
+	MAX_DECISIONS,
+	type Offer,
+	ROOT,
+	drawOffer,
+	openingOperations,
+	roundStatus,
+	template,
+} from '../server/cafe-model'
 
 async function check() {
 	const env = { ...loadEnv('development', process.cwd(), ''), ...process.env }
 	const origin = 'http://localhost:5173'
 	let cookie = ''
-	async function call(body?: unknown, expected = 200, requestOrigin = origin) {
+	async function call(
+		body?: unknown,
+		expected: number | number[] = 200,
+		requestOrigin = origin,
+	): Promise<CafeResponse> {
 		const response = await handleCafe(
 			new Request(`${origin}/api/cafe`, {
 				method: body === undefined ? 'GET' : 'POST',
@@ -19,84 +34,219 @@ async function check() {
 			}),
 			env,
 		)
-		const result = await response.json()
-		assert.equal(response.status, expected, JSON.stringify(result))
+		const result: CafeResponse = await response.json()
+		assert.ok(
+			(Array.isArray(expected) ? expected : [expected]).includes(
+				response.status,
+			),
+			`${response.status} (${typeof body === 'object' && body && 'action' in body ? body.action : 'GET'}): ${JSON.stringify(result)}`,
+		)
 		cookie = response.headers.get('set-cookie')?.split(';')[0] ?? cookie
 		return result
 	}
-	const request = (action: string, step = 0) => ({
+	const request = (action: string, offer?: Offer) => ({
 		action,
-		step,
 		requestId: crypto.randomUUID(),
+		...(offer ? { slot: offer.slot, index: offer.index } : {}),
 	})
-	assert.equal((await call()).state, null)
+	const stateOf = (data: CafeResponse) => {
+		assert.ok(data.state)
+		return data.state
+	}
+	assert.equal(roundStatus(0, 0, 20, 1000, 999), 'active')
+	assert.equal(roundStatus(0, 0, 20, 1000, 1000), 'expired')
+	assert.equal(roundStatus(12, 8, 50, 1000, 2000), 'won')
+	assert.equal(roundStatus(12, 7, 100, 1000, 2000), 'lost')
 	await call(request('start'), 403, 'https://another-site.example')
 	await call({ action: 'start', requestId: 'invalid' }, 400)
 	const opening = request('start')
-	let state = (await call(opening)).state
-	assert.deepEqual(state.balances, { cash: 20, beans: 4, milk: 2, served: 0 })
+	let state = stateOf(await call(opening))
+	assert.deepEqual(state.balances, {
+		cash: 20,
+		beans: 4,
+		milk: 2,
+		served: 0,
+		discarded: 0,
+		moves: 0,
+		journal: 3,
+	})
+	assert.equal(state.offers.length, 3)
 	assert.deepEqual(
-		(await call(opening)).state,
+		stateOf(await call(opening)),
 		state,
-		'Opening retry must not issue twice',
+		'Opening replay must recover the same atomic batch',
 	)
-	state = (await call(request('serve', 0))).state
-	const race = request('race', 1)
+	assert.equal(
+		Date.parse(state.expires_at) -
+			Math.floor(Date.parse(state.started_at) / 1000) * 1000,
+		900000,
+	)
+	assert.equal(
+		(await call()).recent[0].shift,
+		state.shift,
+		'Public history must start with the newest round',
+	)
+	await call(request('milk'))
+	state = stateOf(await call(request('milk')))
+	await call(request('milk'), 422)
+	const affordable = (s: CafeState, offer: Offer) =>
+		s.balances.beans >= offer.beans && s.balances.milk >= offer.milk
+	const first = state.offers.find((o) => affordable(state, o))
+	assert.ok(first)
+	const race = request('race', first)
 	const raced = await call(race)
 	assert.equal(
-		raced.attempts.filter((r: { committed: boolean | null }) => r.committed)
-			.length,
+		raced.attempts?.filter((r) => r.committed).length,
 		1,
-		'Exactly one simultaneous request must commit',
+		'Only one simultaneous serve may consume a ticket',
 	)
-	assert.deepEqual(raced.state.balances, {
-		cash: 35,
-		beans: 2,
-		milk: 1,
-		served: 2,
+	state = stateOf(raced)
+	assert.equal(state.served, 1)
+	assert.equal(state.balances.moves, 1)
+	assert.deepEqual(
+		stateOf(await call(race)),
+		state,
+		'Race replay must not consume the replacement ticket',
+	)
+	await call(request('discard', first), 422)
+	assert.deepEqual(
+		stateOf(await call()),
+		state,
+		'Stale ticket rejection must not change stock or credits',
+	)
+	const discarded = request('discard', state.offers[0])
+	state = stateOf(await call(discarded))
+	assert.equal(state.discarded, 1)
+	assert.deepEqual(
+		stateOf(await call(discarded)),
+		state,
+		'Discard replay must not cost another decision',
+	)
+	assert.equal(state.offers[0].index, (discarded.index ?? 0) + 1)
+	const tooLarge = { ...request('serve'), slot: 3, index: 0 }
+	await call(tooLarge, 400)
+	while (state.balances.moves < MAX_DECISIONS - 1) {
+		const offer = state.offers.find((o) => affordable(state, o))
+		if (offer) state = stateOf(await call(request('serve', offer)))
+		else {
+			const target = [...state.offers].sort(
+				(a, b) => a.beans + a.milk - (b.beans + b.milk),
+			)[0]
+			const action = state.balances.beans < target.beans ? 'coffee' : 'milk'
+			const delivery = request(action)
+			state = stateOf(await call(delivery))
+			assert.deepEqual(
+				stateOf(await call(delivery)),
+				state,
+				'Delivery replay must not charge twice',
+			)
+		}
+	}
+	const finalOffers = state.offers.slice(0, 2)
+	for (const resource of ['beans', 'milk'] as const) {
+		while (
+			state.balances[resource] <
+			Math.max(...finalOffers.map((offer) => offer[resource]))
+		)
+			state = stateOf(
+				await call(request(resource === 'beans' ? 'coffee' : 'milk')),
+			)
+	}
+	const lastDecisions = await Promise.all(
+		finalOffers.map((offer) => call(request('serve', offer), [200, 422])),
+	)
+	assert.equal(
+		lastDecisions.filter((result) => result.state).length,
+		1,
+		'Concurrent different tickets must not exceed twelve decisions',
+	)
+	state = stateOf(await call())
+	assert.equal(state.served, 11)
+	assert.equal(state.discarded, 1)
+	assert.ok(state.cash >= 50)
+	assert.equal(state.status, 'won')
+	await call(request('serve', state.offers[0]), 422)
+	await call(request('coffee'), 422)
+	assert.deepEqual(
+		stateOf(await call()),
+		state,
+		'Reload must restore a complete round',
+	)
+	const finishedCookie = cookie
+	for (let n = 0; n < 6; n++) await call(request('start'))
+	const recent = (await call()).recent
+	assert.equal(recent.length, 6)
+	assert.ok(
+		!recent.some((round) => round.shift === state.shift),
+		'History must show the newest six, not the oldest six',
+	)
+	assert.ok(
+		!JSON.stringify(recent).includes(opening.requestId),
+		'Public history must not disclose cookie capabilities',
+	)
+	cookie = finishedCookie
+	assert.deepEqual(
+		stateOf(await call()),
+		state,
+		'New rounds must not rewrite old receipts',
+	)
+
+	// A zero-duration copy exercises the real server-clock guard without a 15-minute wait.
+	const login = await fetch('https://plinth.sh-lucas.dev/v1/auth/login', {
+		method: 'POST',
+		headers: { 'Content-Type': 'application/json' },
+		body: JSON.stringify({
+			email: env.PLINTH_EMAIL,
+			password: env.PLINTH_PASSWORD,
+		}),
 	})
-	await call(request('serve', 1), 422)
-	assert.deepEqual(
-		(await call(race)).state,
-		raced.state,
-		'Race retry must not sell another order',
+	assert.ok(login.ok)
+	const { token } = (await login.json()) as { token: string }
+	async function api(path: string, body: unknown, key?: string) {
+		const res = await fetch(`https://plinth.sh-lucas.dev/v1${path}`, {
+			method: 'POST',
+			headers: {
+				Authorization: `Bearer ${token}`,
+				'Content-Type': 'application/json',
+				...(key ? { 'Idempotency-Key': key } : {}),
+			},
+			body: JSON.stringify(body),
+		})
+		assert.ok(res.ok, `${path}: ${res.status} ${await res.text()}`)
+	}
+	const expiredTemplate = template('start')
+	expiredTemplate.id = `${ROOT}-expiry-check`
+	for (const node of expiredTemplate.nodes)
+		if (node.id === 'duration') node.value = 0
+	await api('/templates', expiredTemplate)
+	const expiredId = crypto.randomUUID()
+	const offers = await Promise.all(
+		[0, 1, 2].map((slot) => drawOffer(expiredId, slot, 0)),
 	)
-	state = (await call(request('serve', 2))).state
-	await call(request('serve', 3), 422)
-	assert.deepEqual(
-		(await call()).state,
-		state,
-		'Insufficient stock must roll back every posting',
+	const operations = openingOperations(expiredId, offers)
+	operations[0].template = expiredTemplate.id
+	await api('/transactions/batch', { operations }, `cafe2:${expiredId}:open`)
+	cookie = `cafe_shift_v2=${expiredId}`
+	const expired = stateOf(await call())
+	assert.equal(expired.status, 'expired')
+	await call(
+		{
+			...request('serve', expired.offers[0]),
+			client_now: 0,
+			deadline: Date.now() + 99999999,
+		},
+		422,
 	)
-	const delivery = request('restock', 3)
-	state = (await call(delivery)).state
+	await call(request('discard', expired.offers[0]), 422)
+	await call(request('coffee'), 422)
+	await call(request('milk'), 422)
 	assert.deepEqual(
-		(await call(delivery)).state,
-		state,
-		'Delivery retry must not charge twice',
-	)
-	for (const step of [3, 4, 5])
-		state = (await call(request('serve', step))).state
-	state = (await call(request('restock', 6))).state
-	for (const step of [6, 7]) state = (await call(request('serve', step))).state
-	assert.deepEqual(state.balances, { cash: 65, beans: 2, milk: 3, served: 8 })
-	assert.equal(state.history.length, 11)
-	await call(request('serve', 7), 422)
-	assert.deepEqual(
-		(await call()).state,
-		state,
-		'Reload must restore the complete receipt',
-	)
-	const previousCookie = cookie
-	assert.equal((await call(request('start'))).state.balances.served, 0)
-	cookie = previousCookie
-	assert.deepEqual(
-		(await call()).state,
-		state,
-		'New shifts must not rewrite old shifts',
+		stateOf(await call()),
+		expired,
+		'Expired rounds must remain unchanged for every action',
 	)
 	console.log(
-		'Passed against real Plinth: persistence, isolated shifts, atomic rejection, idempotent retries, concurrent order guard, complete 8-order game.',
+		'Passed against real Plinth: three persistent choices, atomic opening and retries, single-use tickets, discard, pantry capacity, complete game, newest six public rounds, and server-clock expiry for every action.',
 	)
 }
 check().catch((error) => {

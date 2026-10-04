@@ -1,9 +1,19 @@
 import {
+	ACTIONS,
 	type CafeState,
-	ORDERS,
+	MAX_DECISIONS,
+	type Offer,
+	RECIPES,
 	RESOURCES,
 	ROOT,
 	type Resource,
+	type RoundSummary,
+	bucketRefs,
+	drawOffer,
+	offerInputs,
+	offerRef,
+	openingOperations,
+	roundStatus,
 	template,
 } from './cafe-model'
 
@@ -14,7 +24,7 @@ export interface CafeEnv {
 const API = 'https://plinth.sh-lucas.dev/v1'
 const UUID =
 	/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/
-const COOKIE = 'cafe_shift'
+const COOKIE = 'cafe_shift_v2'
 class ApiError extends Error {
 	constructor(
 		public status: number,
@@ -92,9 +102,9 @@ export async function setupCafe(env: CafeEnv) {
 	await plinth(env, '/domains', {
 		id: ROOT,
 		kind: 'organizational',
-		name: 'Portfolio night shift',
+		name: 'Portfolio night shift: three choices',
 	})
-	for (const id of RESOURCES)
+	for (const id of [...RESOURCES, 'orders'])
 		await plinth(env, '/domains', {
 			id: `${ROOT}-${id}`,
 			parent: ROOT,
@@ -102,82 +112,202 @@ export async function setupCafe(env: CafeEnv) {
 			unit: id === 'cash' ? 'credit' : 'unit',
 		})
 	for (const action of [
-		'open',
-		'restock',
-		'espresso',
-		'white',
-		'double',
+		...ACTIONS.filter((action) => action !== 'race'),
+		'counters',
+		'offers',
 	] as const)
 		await plinth(env, '/templates', template(action))
 }
 
-const buckets = (shift: string) =>
-	Object.fromEntries(
-		RESOURCES.map((id) => [id, `cafe-${shift}-${id}`]),
-	) as Record<Resource, string>
+interface Transaction {
+	id: string
+	memo?: string
+	created_at: string
+	inputs: Record<string, string | number>
+	metadata?: { slot?: number; index?: number }
+	postings: { bucket: string; amount: number; sequence: number }[]
+}
+function persistedOffer(
+	inputs: Transaction['inputs'],
+	prefix: string,
+	slot: number,
+	index: number,
+): Offer {
+	const recipe = Number(inputs[`${prefix}_recipe`])
+	return {
+		slot,
+		index,
+		recipe,
+		name: RECIPES[recipe].name,
+		beans: Number(inputs[`${prefix}_beans`]),
+		milk: Number(inputs[`${prefix}_milk`]),
+		price: Number(inputs[`${prefix}_price`]),
+	}
+}
+const summary = ({
+	shift,
+	started_at,
+	expires_at,
+	ended_at,
+	status,
+	cash,
+	served,
+	discarded,
+}: CafeState): RoundSummary => ({
+	shift,
+	started_at,
+	expires_at,
+	ended_at,
+	status,
+	cash,
+	served,
+	discarded,
+})
 
-async function readState(env: CafeEnv, shift: string): Promise<CafeState> {
-	const refs = buckets(shift)
-	// Derive the counter from the receipt so both reflect the same transactions.
-	const { items } = await plinth<{
-		items: {
-			id: string
-			memo?: string
-			created_at: string
-			postings: { bucket: string; amount: number }[]
-		}[]
-	}>(env, `/transactions?bucket=${refs.cash}&per_page=100`)
-	const history: CafeState['history'] = items
-		.map((tx) => ({
+async function readState(
+	env: CafeEnv,
+	shift: string,
+	now = Date.now(),
+): Promise<CafeState> {
+	const refs = bucketRefs(shift)
+	// 12 decisions and bounded paid deliveries keep a round below 100 operations.
+	const [{ items, pagination }, { attributes }] = await Promise.all([
+		plinth<{ items: Transaction[]; pagination: { has_next: boolean } }>(
+			env,
+			`/transactions?bucket=${refs.journal}&per_page=100`,
+		),
+		plinth<{ attributes: { started_at: number; deadline: number } }>(
+			env,
+			`/buckets/${refs.journal}`,
+		),
+	])
+	if (pagination.has_next)
+		throw new ApiError(503, 'This receipt is too large to read safely.')
+	const sequence = (tx: Transaction) =>
+		tx.postings.find((posting) => posting.bucket === refs.journal)?.sequence ??
+		0
+	const transactions = items.sort((a, b) => sequence(a) - sequence(b))
+	if (!transactions.length)
+		throw new ApiError(404, 'This shift could not be found. Open a new one.')
+	const opening = transactions.find(
+		(tx) => typeof tx.inputs.journal_reference === 'string',
+	)
+	const initialOffers = transactions.find(
+		(tx) => tx.inputs.offer_0_recipe !== undefined,
+	)
+	if (!opening || !initialOffers)
+		throw new ApiError(503, 'This shift could not be read safely.')
+	const offers = [0, 1, 2].map((slot) =>
+		persistedOffer(initialOffers.inputs, `offer_${slot}`, slot, 0),
+	)
+	const balances = Object.fromEntries(RESOURCES.map((id) => [id, 0])) as Record<
+		Resource,
+		number
+	>
+	let finishedAt: string | null = null
+	const history = transactions.map((tx) => {
+		if (tx.metadata?.slot !== undefined && tx.metadata.index !== undefined) {
+			const { slot, index } = tx.metadata
+			offers[slot] = persistedOffer(tx.inputs, 'next', slot, index + 1)
+		}
+		const postings = tx.postings.flatMap((p) => {
+			const resource = RESOURCES.find((id) => refs[id] === p.bucket)
+			return resource ? [{ resource, amount: p.amount }] : []
+		})
+		for (const posting of postings) balances[posting.resource] += posting.amount
+		if (balances.moves === MAX_DECISIONS && !finishedAt)
+			finishedAt = tx.created_at
+		return {
 			id: tx.id,
 			memo: tx.memo ?? 'Ledger operation',
 			created_at: tx.created_at,
-			postings: tx.postings.flatMap((p) => {
-				const resource = RESOURCES.find((id) => refs[id] === p.bucket)
-				return resource ? [{ resource, amount: p.amount }] : []
-			}),
-		}))
-		.sort(
-			(a, b) =>
-				a.created_at.localeCompare(b.created_at) || a.id.localeCompare(b.id),
-		)
-	const balances = { cash: 0, beans: 0, milk: 0, served: 0 }
-	for (const tx of history)
-		for (const posting of tx.postings)
-			balances[posting.resource] += posting.amount
-	if (!history.length)
-		throw new ApiError(404, 'This shift could not be found. Open a new one.')
-	return { shift: shift.slice(0, 8), balances, history }
+			postings: postings.filter((p) => p.resource !== 'journal'),
+		}
+	})
+	// The deadline is an immutable attribute computed by Plinth's server clock.
+	const deadline = attributes.deadline * 1000
+	const status = roundStatus(
+		balances.moves,
+		balances.served,
+		balances.cash,
+		deadline,
+		now,
+	)
+	return {
+		shift: shift.slice(0, 8),
+		started_at: opening.created_at,
+		expires_at: new Date(deadline).toISOString(),
+		ended_at:
+			finishedAt ??
+			(status === 'expired' ? new Date(deadline).toISOString() : null),
+		status,
+		cash: balances.cash,
+		served: balances.served,
+		discarded: balances.discarded,
+		balances,
+		offers,
+		history,
+	}
+}
+
+async function recentRounds(
+	env: CafeEnv,
+	now: number,
+): Promise<RoundSummary[]> {
+	const { items } = await plinth<{ items: Transaction[] }>(
+		env,
+		`/transactions?template=${ROOT}-start&per_page=6`,
+	)
+	const rounds = await Promise.all(
+		items.map((tx) => {
+			const ref = String(tx.inputs.journal_reference)
+			const shift = ref.slice('cafe2-'.length, -'-journal'.length)
+			if (!UUID.test(shift))
+				throw new ApiError(503, 'The recent rounds could not be read safely.')
+			return readState(env, shift, now)
+		}),
+	)
+	return rounds
+		.map(summary)
+		.sort((a, b) => b.started_at.localeCompare(a.started_at))
 }
 
 async function execute(
 	env: CafeEnv,
 	shift: string,
 	action: string,
-	step: number,
+	slot: number,
+	index: number,
 	key: string,
 ) {
-	const order = ORDERS[step]
-	const operation =
-		action === 'restock'
-			? 'restock'
-			: order.milk === 0
-				? 'espresso'
-				: order.beans === 1
-					? 'white'
-					: 'double'
+	const inputs: Record<string, string | number> = bucketRefs(shift)
+	let memo: string
+	if (action === 'coffee' || action === 'milk')
+		memo =
+			action === 'coffee'
+				? 'Delivery: 3 coffee for 7 credits'
+				: 'Delivery: 3 milk for 5 credits'
+	else {
+		const offer = await drawOffer(shift, slot, index)
+		Object.assign(
+			inputs,
+			{ order: offerRef(shift, slot, index) },
+			offerInputs(shift, await drawOffer(shift, slot, index + 1), 'next'),
+		)
+		memo = `${action === 'discard' ? 'Discarded' : 'Served'}: ${offer.name} (counter ${slot + 1}, ticket ${index + 1})`
+	}
 	return plinth(
 		env,
-		`/transactions/execute/${ROOT}-${operation}?replay_on_conflict=true`,
+		`/transactions/execute/${ROOT}-${action}?replay_on_conflict=true`,
 		{
 			context: { domain: ROOT },
-			inputs: { ...buckets(shift), step },
-			memo:
-				action === 'restock'
-					? 'Delivery: 4 coffee + 3 milk'
-					: `Order ${step + 1}: ${order.name}`,
+			inputs,
+			memo,
+			...(action === 'serve' || action === 'discard'
+				? { metadata: { slot, index } }
+				: {}),
 		},
-		`cafe:${shift}:${key}`,
+		`cafe2:${shift}:${key}`,
 	)
 }
 
@@ -191,6 +321,19 @@ export async function handleCafe(
 	})
 	const reply = (data: unknown, status = 200) =>
 		new Response(JSON.stringify(data), { status, headers })
+	const result = async (shift?: string, extra = {}) => {
+		const now = Date.now()
+		const [state, recent] = await Promise.all([
+			shift ? readState(env, shift, now) : Promise.resolve(null),
+			recentRounds(env, now),
+		])
+		return reply({
+			state,
+			recent,
+			server_now: new Date(now).toISOString(),
+			...extra,
+		})
+	}
 	try {
 		const url = new URL(request.url)
 		if (!['GET', 'POST'].includes(request.method)) {
@@ -204,15 +347,19 @@ export async function handleCafe(
 			.find((v) => v.startsWith(`${COOKIE}=`))
 			?.slice(COOKIE.length + 1)
 		if (shift && !UUID.test(shift)) shift = undefined
-		if (request.method === 'GET')
-			return reply({ state: shift ? await readState(env, shift) : null })
+		if (request.method === 'GET') return await result(shift)
 		if (request.headers.get('origin') !== url.origin)
 			throw new ApiError(403, 'This request must come from the coffee counter.')
 		if (!request.headers.get('content-type')?.startsWith('application/json'))
 			throw new ApiError(415, 'JSON is required.')
 		const text = await request.text()
 		if (text.length > 1024) throw new ApiError(413, 'Request too large.')
-		let body: { action?: unknown; requestId?: unknown; step?: unknown } | null
+		let body: {
+			action?: unknown
+			requestId?: unknown
+			slot?: unknown
+			index?: unknown
+		} | null
 		try {
 			body = JSON.parse(text)
 		} catch {
@@ -223,69 +370,97 @@ export async function handleCafe(
 			typeof body.requestId !== 'string' ||
 			typeof body.action !== 'string' ||
 			!UUID.test(body.requestId) ||
-			!['start', 'serve', 'restock', 'race'].includes(body.action)
+			!ACTIONS.some((action) => action === body.action)
 		)
 			throw new ApiError(400, 'Invalid coffee counter request.')
 		if (body.action === 'start') {
-			const newShift: string = body.requestId
-			const refs = buckets(newShift)
-			for (const id of RESOURCES)
-				await plinth(env, `/domains/${ROOT}-${id}/buckets`, { id: refs[id] })
-			await plinth(
-				env,
-				`/transactions/execute/${ROOT}-open?replay_on_conflict=true`,
-				{
-					context: { domain: ROOT },
-					inputs: refs,
-					memo: 'Opened the counter: 20 credits, 4 coffee, 2 milk',
-				},
-				`cafe:${newShift}:open`,
+			const newShift = body.requestId
+			const offers = await Promise.all(
+				[0, 1, 2].map((slot) => drawOffer(newShift, slot, 0)),
 			)
+			try {
+				await plinth(
+					env,
+					'/transactions/batch',
+					{ operations: openingOperations(newShift, offers) },
+					`cafe2:${newShift}:open`,
+				)
+			} catch (error) {
+				// Batch retries return 409; an existing complete receipt confirms the atomic opening.
+				if (!(error instanceof ApiError) || error.status !== 409) throw error
+				try {
+					await readState(env, newShift)
+				} catch {
+					throw error
+				}
+			}
 			headers.set(
 				'Set-Cookie',
 				`${COOKIE}=${newShift}; HttpOnly; SameSite=Strict; Path=/api/cafe; Max-Age=31536000${url.protocol === 'https:' ? '; Secure' : ''}`,
 			)
-			return reply({ state: await readState(env, newShift) })
+			return await result(newShift)
 		}
 		if (!shift) throw new ApiError(400, 'Open a shift first.')
-		if (
-			typeof body.step !== 'number' ||
-			!Number.isInteger(body.step) ||
-			body.step < 0 ||
-			body.step >= ORDERS.length
-		)
-			throw new ApiError(400, 'Invalid order.')
 		const currentShift = shift
-		const step = body.step
+		const slot = body.slot
+		const index = body.index
+		if (
+			['serve', 'discard', 'race'].includes(body.action) &&
+			(typeof slot !== 'number' ||
+				!Number.isInteger(slot) ||
+				slot < 0 ||
+				slot > 2 ||
+				typeof index !== 'number' ||
+				!Number.isInteger(index) ||
+				index < 0 ||
+				index > MAX_DECISIONS)
+		)
+			throw new ApiError(400, 'Invalid order selection.')
+		const selectedSlot = typeof slot === 'number' ? slot : 0
+		const selectedIndex = typeof index === 'number' ? index : 0
 		if (body.action === 'race') {
 			const results = await Promise.allSettled(
 				[0, 1].map((n) =>
-					execute(env, currentShift, 'serve', step, `${body.requestId}:${n}`),
+					execute(
+						env,
+						currentShift,
+						'serve',
+						selectedSlot,
+						selectedIndex,
+						`${body.requestId}:${n}`,
+					),
 				),
 			)
-			const attempts = results.map((result, n) => ({
+			const attempts = results.map((attempt, n) => ({
 				request: n + 1,
 				committed:
-					result.status === 'fulfilled'
+					attempt.status === 'fulfilled'
 						? true
-						: result.reason instanceof ApiError && result.reason.status === 422
+						: attempt.reason instanceof ApiError &&
+								attempt.reason.status === 422
 							? false
 							: null,
 				message:
-					result.status === 'fulfilled'
+					attempt.status === 'fulfilled'
 						? 'Committed'
-						: result.reason instanceof ApiError
-							? result.reason.message
+						: attempt.reason instanceof ApiError
+							? attempt.reason.message
 							: 'Connection interrupted. Refresh the receipt to check the result.',
 			}))
-			return reply({
-				state: await readState(env, shift),
+			return await result(shift, {
 				attempts,
 				retryable: attempts.some((attempt) => attempt.committed === null),
 			})
 		}
-		await execute(env, shift, body.action, body.step, body.requestId)
-		return reply({ state: await readState(env, shift) })
+		await execute(
+			env,
+			shift,
+			body.action,
+			selectedSlot,
+			selectedIndex,
+			body.requestId,
+		)
+		return await result(shift)
 	} catch (error) {
 		return reply(
 			{
