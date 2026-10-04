@@ -292,6 +292,9 @@ button:disabled {
 	color: var(--accent);
 	text-underline-offset: 4px;
 }
+.cafe-credit p + p {
+	margin-top: 0.75rem;
+}
 @media (max-width: 480px) {
 	.cafe-opening {
 		padding: 1.5rem;

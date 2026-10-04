@@ -753,19 +753,33 @@ export function CafeSection() {
 					</p>
 				)}
 			</section>
-			<p className="cafe-credit">
-				Stock, credits and single-use tickets are guarded by{' '}
-				<a
-					href="https://about.plinth.sh-lucas.dev"
-					target="_blank"
-					rel="noopener noreferrer"
-				>
-					Plinth
-				</a>
-				, my dedicated ledger service. Each operation commits in full or changes
-				nothing. The receipts and public round history are read from its
-				persistent records.
-			</p>
+			<section className="cafe-credit" aria-labelledby="plinth-title">
+				<div className="section-head">
+					<h3 id="plinth-title" className="section-head-title">
+						What Plinth handles
+					</h3>
+				</div>
+				<p>
+					Plinth is my ledger service: it records quantities and applies rules
+					through atomic transactions. Here, it checks stock, credits, pantry
+					capacity and the twelve-decision limit. Serving an order consumes its
+					ingredients, collects payment and closes the ticket together, so the
+					same order cannot be served twice. Each operation commits in full or
+					changes nothing, with a persistent receipt.
+				</p>
+				<p>
+					The browser handles brewing and delivery timers; the site's backend
+					enforces the two-minute deadline.{' '}
+					<a
+						href="https://about.plinth.sh-lucas.dev"
+						target="_blank"
+						rel="noopener noreferrer"
+					>
+						Learn more about Plinth
+					</a>
+					.
+				</p>
+			</section>
 		</section>
 	)
 }
