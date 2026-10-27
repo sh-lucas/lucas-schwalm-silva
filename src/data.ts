@@ -65,7 +65,7 @@ export const EXPERIENCES: Experience[] = [
 		link: 'https://metriasales.com/',
 		highlights: [
 			'Full-stack web and backend development for sales CRM.',
-			'AI integrations, data processing, and classification pipelines.',
+			'DevOps, CI and deployment.',
 		],
 		techs: ['Node.js', 'MySQL', 'React', 'CI/CD'],
 	},
@@ -76,7 +76,7 @@ export const PROJECTS: Project[] = [
 		name: 'Plinth',
 		link: 'https://about.plinth.sh-lucas.dev',
 		techs: ['Web API'],
-		desc: 'A multi-tenant ledger for managing any quantity, built to be auditable, reliable, and extensively configurable.',
+		desc: 'A balance engine with configurable rules that handles concurrency, auditing and consistency for you.',
 	},
 	{
 		name: 'checkup',
