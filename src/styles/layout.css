@@ -30,10 +30,10 @@
 	border-bottom: 1px solid var(--border);
 }
 .tab-btn {
-	padding: 0 0 0.85rem;
+	padding: 0 0 calc(0.85rem + 2px);
 	margin-bottom: -1px;
+	position: relative;
 	border: 0;
-	border-bottom: 2px solid transparent;
 	background: transparent;
 	color: var(--text-secondary);
 	font-size: 0.9375rem;
@@ -43,9 +43,20 @@
 .tab-btn:hover {
 	color: var(--text-primary);
 }
+.tab-btn::after {
+	content: '';
+	position: absolute;
+	inset: auto 0 0;
+	height: 2px;
+	background: var(--accent);
+	transform: scaleX(0);
+	transition: transform 220ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
 .tab-btn.active {
-	border-bottom-color: var(--accent);
 	color: var(--text-primary);
+}
+.tab-btn.active::after {
+	transform: scaleX(1);
 }
 .info-content {
 	grid-column: 2;
