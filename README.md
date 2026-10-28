@@ -53,10 +53,13 @@ This uses the supplied test account and fictional quantities. Before opening it 
 ## Check
 
 ```sh
+npm run check
 npm run build
 npm run cafe:timing-check
 npm run cafe:check
 ```
+
+`check` runs [Vite+](https://viteplus.dev) format, lint (Oxlint) and type checks; `pnpm exec vp check --fix` fixes formatting. `build` runs the same checks except format.
 
 `cafe:timing-check` runs locally without a service connection. It checks preparation times, independent delivery deadlines, reserved costs, reload recovery, stale tickets, cancellation and unconfirmed retry persistence.
 

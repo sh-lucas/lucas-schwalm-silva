@@ -76,7 +76,7 @@ export function App() {
 			}
 		}
 
-		poll()
+		void poll()
 		pollingInterval = setInterval(poll, 1000)
 
 		const connectSSE = () => {
@@ -112,7 +112,7 @@ export function App() {
 					setStreamStatus('polling')
 
 					if (!pollingInterval) {
-						poll()
+						void poll()
 						pollingInterval = setInterval(poll, 1000)
 					}
 					reconnectTimeout = setTimeout(connectSSE, 15000)

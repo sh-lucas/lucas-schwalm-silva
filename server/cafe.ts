@@ -394,6 +394,7 @@ export async function handleCafe(
 			!ACTIONS.some((action) => action === body.action)
 		)
 			throw new ApiError(400, 'Invalid coffee counter request.')
+		const requestId = body.requestId
 		if (body.action === 'start') {
 			const newShift = body.requestId
 			const offers = await Promise.all(
@@ -452,7 +453,7 @@ export async function handleCafe(
 			if (body.action === 'race') {
 				const attempts = [0, 1].map((n) => {
 					const committed = current.history.some(
-						(tx) => tx.request_id === `${body.requestId}:${n}`,
+						(tx) => tx.request_id === `${requestId}:${n}`,
 					)
 					return {
 						request: n + 1,
@@ -478,7 +479,7 @@ export async function handleCafe(
 						'serve',
 						selectedSlot,
 						selectedIndex,
-						`${body.requestId}:${n}`,
+						`${requestId}:${n}`,
 						deadline,
 					),
 				),
@@ -489,7 +490,7 @@ export async function handleCafe(
 					attempt.status === 'fulfilled'
 						? true
 						: attempt.reason instanceof ApiError &&
-								attempt.reason.status === 422
+							  attempt.reason.status === 422
 							? false
 							: null,
 				message:

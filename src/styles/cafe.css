@@ -73,7 +73,7 @@
 	);
 }
 .cup-body::after {
-	content: "";
+	content: '';
 	position: absolute;
 	left: 100%;
 	top: 3px;
@@ -201,7 +201,7 @@ button:disabled {
 	color: var(--status-warn);
 	margin-bottom: 0.4rem;
 }
-.race-results li[data-committed="true"] strong {
+.race-results li[data-committed='true'] strong {
 	color: var(--status-ok);
 }
 .race-results span {
@@ -535,14 +535,14 @@ button:disabled {
 	color: var(--text-tertiary);
 	font-size: 0.75rem;
 }
-.round-status[data-status="won"] {
+.round-status[data-status='won'] {
 	color: var(--status-ok);
 }
-.round-status[data-status="finished"] {
+.round-status[data-status='finished'] {
 	color: var(--accent);
 }
-.round-status[data-status="expired"],
-.round-status[data-status="lost"] {
+.round-status[data-status='expired'],
+.round-status[data-status='lost'] {
 	color: var(--status-warn);
 }
 @media (max-width: 1000px) and (min-width: 801px), (max-width: 560px) {

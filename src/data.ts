@@ -35,8 +35,6 @@ export const TABS = [
 	{ id: 'play', label: 'Play', route: '/play' },
 ] as const
 
-export type TabId = (typeof TABS)[number]['id']
-
 export const EXPERIENCES: Experience[] = [
 	{
 		company: 'Roxcode',

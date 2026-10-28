@@ -20,5 +20,12 @@
 		"noUnusedParameters": true,
 		"noFallthroughCasesInSwitch": true
 	},
-	"include": ["src", "server", "functions", "index.tsx"]
+	"include": [
+		"src",
+		"server",
+		"functions",
+		"scripts",
+		"index.tsx",
+		"vite.config.ts"
+	]
 }

@@ -95,15 +95,17 @@
 }
 .metric-bar-fill {
 	height: 100%;
-	transition: width 1s ease, background-color 600ms ease;
+	transition:
+		width 1s ease,
+		background-color 600ms ease;
 }
-.metric-bar-fill[data-tone="ok"] {
+.metric-bar-fill[data-tone='ok'] {
 	background: var(--status-ok);
 }
-.metric-bar-fill[data-tone="warn"] {
+.metric-bar-fill[data-tone='warn'] {
 	background: var(--status-warn);
 }
-.metric-bar-fill[data-tone="critical"] {
+.metric-bar-fill[data-tone='critical'] {
 	background: var(--status-critical);
 }
 .metric-ticks-container {

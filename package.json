@@ -3,12 +3,13 @@
 	"version": "2.0.0",
 	"private": true,
 	"scripts": {
-		"dev": "vite",
-		"build": "tsc && vite build && tsx scripts/prerender.ts",
-		"preview": "vite preview",
-		"cafe:setup": "tsx scripts/setup-cafe.ts",
-		"cafe:check": "tsx scripts/check-cafe.ts",
-		"cafe:timing-check": "tsx scripts/check-cafe-timing.ts"
+		"dev": "vp dev",
+		"build": "vp check --no-fmt && vp build && vpx scripts/prerender.ts",
+		"check": "vp check",
+		"preview": "vp preview",
+		"cafe:setup": "vpx scripts/setup-cafe.ts",
+		"cafe:check": "vpx scripts/check-cafe.ts",
+		"cafe:timing-check": "vpx scripts/check-cafe-timing.ts"
 	},
 	"dependencies": {
 		"react": "^18.3.1",
@@ -16,11 +17,11 @@
 		"react-router-dom": "^7.18.1"
 	},
 	"devDependencies": {
-		"@biomejs/biome": "^1.9.4",
+		"@types/node": "^24.19.2",
 		"@types/react": "^18.3.12",
 		"@types/react-dom": "^18.3.1",
-		"tsx": "^4.23.15",
-		"typescript": "^5.6.3",
-		"vite": "^6.0.2"
-	}
+		"vite": "catalog:",
+		"vite-plus": "catalog:"
+	},
+	"packageManager": "pnpm@11.2.2"
 }

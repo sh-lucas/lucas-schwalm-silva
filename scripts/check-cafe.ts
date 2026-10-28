@@ -39,7 +39,7 @@ async function check() {
 			(Array.isArray(expected) ? expected : [expected]).includes(
 				response.status,
 			),
-			`${response.status} (${typeof body === 'object' && body && 'action' in body ? body.action : 'GET'}): ${JSON.stringify(result)}`,
+			`${response.status} (${typeof body === 'object' && body && 'action' in body ? String(body.action) : 'GET'}): ${JSON.stringify(result)}`,
 		)
 		cookie = response.headers.get('set-cookie')?.split(';')[0] ?? cookie
 		return result

@@ -1,9 +1,22 @@
-import { defineConfig, loadEnv } from 'vite'
+import { defineConfig, loadEnv } from 'vite-plus'
 import { handleCafe } from './server/cafe'
 
 export default defineConfig(({ mode }) => {
 	const env = { ...loadEnv(mode, process.cwd(), ''), ...process.env }
 	return {
+		fmt: {
+			ignorePatterns: ['dist/**'],
+			useTabs: true,
+			singleQuote: true,
+			semi: false,
+			printWidth: 80,
+		},
+		lint: {
+			ignorePatterns: ['dist/**'],
+			jsPlugins: [{ name: 'vite-plus', specifier: 'vite-plus/oxlint-plugin' }],
+			rules: { 'vite-plus/prefer-vite-plus-imports': 'error' },
+			options: { typeAware: true, typeCheck: true },
+		},
 		plugins: [
 			{
 				name: 'coffee-counter-api',

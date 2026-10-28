@@ -7,7 +7,7 @@ export const RECIPES = [
 	{ name: 'Milk for the whole desk', beans: 2, milk: 3, price: 18 },
 ] as const
 export const ROOT = 'portfolio-cafe-v2'
-export const ROUND_SECONDS = 15 * 60
+const ROUND_SECONDS = 15 * 60
 export const RUSH_SECONDS = 2 * 60
 export const MAX_DECISIONS = 12
 export const TARGET_CASH = 50
