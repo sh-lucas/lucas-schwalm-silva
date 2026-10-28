@@ -1,4 +1,4 @@
-import type { Action, CafeState, Offer } from '../server/cafe-model'
+import type { Action, CafeState, Offer } from './cafe-model'
 
 export interface CafeRequest {
 	action: Action

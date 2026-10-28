@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict'
-import type { CafeState } from '../server/cafe-model'
+import type { CafeState } from '../src/cafe-model'
 import {
 	type CafeJob,
 	deliveryCost,

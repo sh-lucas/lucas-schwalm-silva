@@ -7,9 +7,8 @@ import {
 	MAX_DECISIONS,
 	type Offer,
 	type RoundSummary,
-	TARGET_CASH,
-	TARGET_SERVED,
-} from '../../server/cafe-model'
+} from '../cafe-model'
+import { cafe } from '../cafe-api'
 import {
 	type CafeJob,
 	type CafeRequest,
@@ -118,7 +117,7 @@ export function CafeSection() {
 		busy.current = true
 		setLoading(true)
 		try {
-			const res = await fetch('/api/cafe')
+			const res = await cafe()
 			const data: CafeResponse = await res.json()
 			if (!res.ok) throw new Error(data.error)
 			if (mounted.current) {
@@ -173,11 +172,7 @@ export function CafeSection() {
 			)
 			let retryable = true
 			try {
-				const res = await fetch('/api/cafe', {
-					method: 'POST',
-					headers: { 'Content-Type': 'application/json' },
-					body: JSON.stringify(request),
-				})
+				const res = await cafe(request)
 				const data: CafeResponse = await res.json()
 				if (!mounted.current) return
 				if (!res.ok) {
@@ -368,8 +363,6 @@ export function CafeSection() {
 							</span>
 							<p>
 								{state.served} served · {state.discarded} discarded
-								{state.mode === 'classic' &&
-									` · Original shift: ${TARGET_SERVED} served / ${TARGET_CASH} credits target`}
 							</p>
 						</div>
 					</div>
@@ -706,7 +699,7 @@ export function CafeSection() {
 				</div>
 				<p className="cafe-rule-note">
 					The six most recently opened rounds. Rushes close after two minutes or
-					twelve decisions; original shifts keep their 15-minute deadline.
+					twelve decisions.
 				</p>
 				{recent.length ? (
 					<ol>

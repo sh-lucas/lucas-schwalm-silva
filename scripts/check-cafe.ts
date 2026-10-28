@@ -1,39 +1,37 @@
 import assert from 'node:assert/strict'
 import { loadEnv } from 'vite'
-import { handleCafe } from '../server/cafe'
+import { cafe, config } from '../src/cafe-api'
 import {
 	type CafeResponse,
 	type CafeState,
 	MAX_DECISIONS,
 	type Offer,
+	RECIPES,
 	ROOT,
 	RUSH_SECONDS,
-	drawOffer,
-	openingOperations,
+	bucketRefs,
 	roundStatus,
-} from '../server/cafe-model'
+} from '../src/cafe-model'
+import type { CafeRequest } from '../src/cafe-timing'
+
+// The browser client keeps its round in localStorage; Node needs a small stand-in.
+const storage = new Map<string, string>()
+Object.assign(globalThis, {
+	localStorage: {
+		getItem: (key: string) => storage.get(key) ?? null,
+		setItem: (key: string, value: string) => storage.set(key, value),
+	},
+})
 
 async function check() {
 	const env = { ...loadEnv('development', process.cwd(), ''), ...process.env }
-	const origin = 'http://localhost:5173'
-	let cookie = ''
+	config.token = env.VITE_PLINTH_TOKEN
+	assert.ok(config.token, 'Set VITE_PLINTH_TOKEN (run cafe:token) first.')
 	async function call(
 		body?: unknown,
 		expected: number | number[] = 200,
-		requestOrigin = origin,
 	): Promise<CafeResponse> {
-		const response = await handleCafe(
-			new Request(`${origin}/api/cafe`, {
-				method: body === undefined ? 'GET' : 'POST',
-				headers: {
-					cookie,
-					Origin: requestOrigin,
-					'Content-Type': 'application/json',
-				},
-				...(body === undefined ? {} : { body: JSON.stringify(body) }),
-			}),
-			env,
-		)
+		const response = await cafe(body as CafeRequest | undefined)
 		const result: CafeResponse = await response.json()
 		assert.ok(
 			(Array.isArray(expected) ? expected : [expected]).includes(
@@ -41,7 +39,6 @@ async function check() {
 			),
 			`${response.status} (${typeof body === 'object' && body && 'action' in body ? String(body.action) : 'GET'}): ${JSON.stringify(result)}`,
 		)
-		cookie = response.headers.get('set-cookie')?.split(';')[0] ?? cookie
 		return result
 	}
 	const request = (action: string, offer?: Offer) => ({
@@ -60,8 +57,6 @@ async function check() {
 	assert.equal(roundStatus(0, 0, 20, 1000, 999, true), 'active')
 	assert.equal(roundStatus(0, 0, 20, 1000, 1000, true), 'finished')
 	assert.equal(roundStatus(12, 0, 20, 1000, 999, true), 'finished')
-	await call(request('start'), 403, 'https://another-site.example')
-	await call({ action: 'start', requestId: 'invalid' }, 400)
 	const opening = request('start')
 	let state = stateOf(await call(opening))
 	assert.deepEqual(state.balances, {
@@ -71,13 +66,20 @@ async function check() {
 		served: 0,
 		discarded: 0,
 		moves: 0,
-		journal: 3,
+		journal: 1,
 	})
 	assert.equal(state.offers.length, 3)
+	for (const offer of state.offers) {
+		const recipe = RECIPES[offer.recipe]
+		assert.ok(recipe, 'Plinth must draw a known recipe')
+		assert.equal(offer.beans, recipe.beans)
+		assert.equal(offer.milk, recipe.milk)
+		assert.ok(offer.price >= recipe.price && offer.price <= recipe.price + 3)
+	}
 	assert.deepEqual(
 		stateOf(await call(opening)),
 		state,
-		'Opening replay must recover the same atomic batch',
+		'Opening replay must recover the same atomic opening',
 	)
 	assert.equal(
 		Date.parse(state.expires_at) -
@@ -128,7 +130,7 @@ async function check() {
 	)
 	assert.equal(state.offers[0].index, (discarded.index ?? 0) + 1)
 	const tooLarge = { ...request('serve'), slot: 3, index: 0 }
-	await call(tooLarge, 400)
+	await call(tooLarge, [400, 404])
 	while (state.balances.moves < MAX_DECISIONS - 1) {
 		const offer = state.offers.find((o) => affordable(state, o))
 		if (offer) state = stateOf(await call(request('serve', offer)))
@@ -176,7 +178,7 @@ async function check() {
 		state,
 		'Reload must restore a complete round',
 	)
-	const finishedCookie = cookie
+	const finishedRound = storage.get('cafe-round-v4')
 	assert.deepEqual(
 		stateOf(await call(discarded)),
 		state,
@@ -215,18 +217,32 @@ async function check() {
 		!recent.some((round) => round.shift === state.shift),
 		'History must show the newest six, not the oldest six',
 	)
-	assert.ok(
-		!JSON.stringify(recent).includes(opening.requestId),
-		'Public history must not disclose cookie capabilities',
+	const secrets = JSON.parse(storage.get('cafe-secrets-v4') ?? '{}')
+	const activeRound = Number(storage.get('cafe-round-v4'))
+	const journal = await fetch(
+		`${config.api}/transactions?bucket=${encodeURIComponent(bucketRefs(activeRound).journal)}`,
+		{ headers: { Authorization: `Bearer ${config.token}` } },
 	)
-	cookie = finishedCookie
+	const receipt = await journal.text()
+	assert.ok(journal.ok, receipt)
+	assert.ok(
+		!receipt.includes(String(secrets[activeRound])),
+		'Public readers must not see the round secret',
+	)
+	storage.set(
+		'cafe-secrets-v4',
+		JSON.stringify({ ...secrets, [activeRound]: secrets[activeRound] + 1 }),
+	)
+	await call(request('coffee'), 409)
+	storage.set('cafe-secrets-v4', JSON.stringify(secrets))
+	storage.set('cafe-round-v4', String(finishedRound))
 	assert.deepEqual(
 		stateOf(await call()),
 		state,
 		'New rounds must not rewrite old receipts',
 	)
 
-	// A zero-duration copy exercises the real server-clock guard without a 15-minute wait.
+	// A zero-duration copy exercises the real server-clock guard without a two-minute wait.
 	const login = await fetch('https://plinth.sh-lucas.dev/v1/auth/login', {
 		method: 'POST',
 		headers: { 'Content-Type': 'application/json' },
@@ -250,25 +266,23 @@ async function check() {
 		assert.ok(res.ok, `${path}: ${res.status} ${await res.text()}`)
 	}
 	// Reuse the existing clock fixture; this check does not publish templates.
-	const expiredId = crypto.randomUUID()
-	const offers = await Promise.all(
-		[0, 1, 2].map((slot) => drawOffer(expiredId, slot, 0)),
-	)
-	const operations = openingOperations(expiredId, offers)
-	operations[0].template = `${ROOT}-expiry-check`
-	await api('/transactions/batch', { operations }, `cafe2:${expiredId}:open`)
-	cookie = `cafe_shift_v2=${expiredId}`
-	const expired = stateOf(await call())
-	assert.equal(expired.status, 'expired')
-	assert.equal(expired.mode, 'classic')
-	await call(
+	const expiredRound = Date.now() * 1000 + Math.floor(Math.random() * 1000)
+	await api(
+		`/transactions/execute/${ROOT}-expiry-check`,
 		{
-			...request('serve', expired.offers[0]),
-			client_now: 0,
-			deadline: Date.now() + 99999999,
+			context: { domain: `${ROOT}-journal` },
+			inputs: { round: expiredRound, secret: 1 },
 		},
-		422,
+		`cafe4:${expiredRound}:open`,
 	)
+	storage.set('cafe-round-v4', String(expiredRound))
+	storage.set(
+		'cafe-secrets-v4',
+		JSON.stringify({ ...secrets, [expiredRound]: 1 }),
+	)
+	const expired = stateOf(await call())
+	assert.equal(expired.status, 'finished')
+	await call(request('serve', expired.offers[0]), 422)
 	await call(request('discard', expired.offers[0]), 422)
 	await call(request('coffee'), 422)
 	await call(request('milk'), 422)
@@ -278,7 +292,7 @@ async function check() {
 		'Expired rounds must remain unchanged for every action',
 	)
 	console.log(
-		'Passed against real Plinth: rush metadata and two-minute expiry, closed-round retries, three persistent choices, atomic opening, single-use tickets, pantry capacity, twelve-decision closure, newest six public rounds, and original server-clock expiry. No templates published.',
+		'Passed against real Plinth with the public token: round secrets hidden and enforced, two-minute expiry, closed-round retries, three persistent choices, atomic opening, single-use tickets, pantry capacity, twelve-decision closure, newest six public rounds, and original server-clock expiry. No templates published.',
 	)
 }
 check().catch((error) => {
