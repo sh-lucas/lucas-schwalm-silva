@@ -13,3 +13,17 @@ ReactDOM.createRoot(container).render(
 		</BrowserRouter>
 	</React.StrictMode>,
 )
+
+// Hide the loading screen once styles, fonts and the first render are done
+const loader = document.getElementById('loader')
+const pageLoaded = new Promise((resolve) =>
+	document.readyState === 'complete'
+		? resolve(null)
+		: window.addEventListener('load', resolve, { once: true }),
+)
+void pageLoaded
+	.then(() => document.fonts.ready)
+	.then(() => {
+		loader?.classList.add('done')
+		loader?.addEventListener('transitionend', () => loader.remove())
+	})

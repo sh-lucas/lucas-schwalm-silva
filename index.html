@@ -138,7 +138,46 @@
 			.noscript-link:hover {
 				border-color: #575348;
 			}
+
+			/* Loading screen: covers the page until fonts, styles and React are ready */
+			#loader {
+				position: fixed;
+				inset: 0;
+				z-index: 9999;
+				display: grid;
+				place-items: center;
+				background: var(--bg);
+				transition: opacity 250ms ease;
+			}
+
+			#loader.done {
+				opacity: 0;
+				pointer-events: none;
+			}
+
+			#loader::after {
+				content: '';
+				width: 28px;
+				height: 28px;
+				border: 3px solid #35342e;
+				border-top-color: var(--text-primary);
+				border-radius: 50%;
+				animation: loader-spin 800ms linear infinite;
+			}
+
+			@keyframes loader-spin {
+				to {
+					transform: rotate(360deg);
+				}
+			}
+
+			@media (prefers-reduced-motion: reduce) {
+				#loader::after {
+					animation-duration: 2400ms;
+				}
+			}
 		</style>
+		<noscript><style>#loader { display: none; }</style></noscript>
 	</head>
 	<body>
 		<noscript>
@@ -180,6 +219,7 @@
 			</div>
 		</noscript>
 
+		<div id="loader" role="status" aria-label="Loading"></div>
 		<div id="container"></div>
 	</body>
 </html>
