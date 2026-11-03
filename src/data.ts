@@ -77,23 +77,23 @@ export const PROJECTS: Project[] = [
 		desc: 'A balance engine with configurable rules that handles concurrency, auditing and consistency for you.',
 	},
 	{
-		name: 'checkup',
-		link: 'https://github.com/sh-lucas/checkup',
-		techs: ['Rust'],
-		desc: 'Small system monitor and uptime calculator — the backend streaming live metrics to this very dashboard.',
-	},
-	{
-		name: 'honeypot-ops',
-		link: 'https://github.com/sh-lucas/honeypot-ops',
-		techs: ['NixOS', 'Kubernetes', 'FluxCD', 'SOPS'],
-		desc: 'The very soul of my K3s cluster. All production secrets are proudly committed directly to the repo — good luck, though.',
-	},
-	{
 		name: 'vops',
 		link: 'https://github.com/sh-lucas/vops',
 		techs: ['Go', 'Podman', 'Git'],
 		desc: 'Self-host containers from a Git repo of Compose files. One Go binary with its own registry, rolling releases and rollback.',
 	},
+	{
+		name: 'honeypot-ops',
+		link: 'https://github.com/sh-lucas/honeypot-ops',
+		techs: ['NixOS', 'Kubernetes', 'FluxCD', 'SOPS'],
+		desc: 'The very soul of my K3s cluster. Secrets and keys proudly commited.',
+  },
+  {
+    name: 'libsql-handler',
+    link: 'https://github.com/sh-lucas/libsql-handler',
+    techs: ['Go', 'LibSQL', 'tcp'],
+    desc: 'Expose your sqlite on the web just like libsql/slqd, but as a golang handler.',
+  },
 ]
 
 export const PRODUCTION_EXCUSES = [
