@@ -29,12 +29,15 @@ export function SiteHeader() {
 			</div>
 
 			<p className="header-bio">
-				{calculateAge()} y/o Computer Engineering student at UERGS, building
-				software that fits. Currently developing at{' '}
+        Computer Engineering student at UERGS.<br/>
+        Full stack engineer at{' '}
 				<a href="https://roxcode.io/" target="_blank" rel="noopener noreferrer">
 					Roxcode
-				</a>
-				.
+        </a>. <br/>
+        DevOps and Architect at{' '}
+        <a href="https://fascode.com.br/" target="_blank" rel="noopener noreferrer">
+					Fascode
+        </a>.
 			</p>
 
 			<div className="social-links">
