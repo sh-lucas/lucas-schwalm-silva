@@ -37,7 +37,7 @@ const labels = {
 	finished: 'Rush finished',
 }
 const date = (value: string) =>
-	new Date(value).toLocaleString([], {
+	new Date(value).toLocaleString('en-US', {
 		month: 'short',
 		day: 'numeric',
 		year: 'numeric',
@@ -644,7 +644,7 @@ export function CafeSection() {
 									<div>
 										<strong>{tx.memo}</strong>
 										<time dateTime={tx.created_at}>
-											{new Date(tx.created_at).toLocaleTimeString([], {
+											{new Date(tx.created_at).toLocaleTimeString('en-US', {
 												hour: '2-digit',
 												minute: '2-digit',
 											})}

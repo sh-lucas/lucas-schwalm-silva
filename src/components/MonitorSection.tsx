@@ -138,7 +138,7 @@ export function MonitorSection({
 					<h2 className="section-head-title">System metrics</h2>
 					<span className="section-head-meta">
 						{lastUpdated
-							? `updated ${lastUpdated.toLocaleTimeString()}`
+							? `updated ${lastUpdated.toLocaleTimeString('en-US')}`
 							: 'waiting for a reading'}
 					</span>
 				</div>

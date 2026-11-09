@@ -41,11 +41,11 @@ export const EXPERIENCES: Experience[] = [
 		role: 'Full Stack Developer',
 		link: 'https://roxcode.io/',
 		highlights: [
-			'Backend development and integrations for multiple projects, including Frigelar, Internacional Shopping, and Nectar Applications.',
-			'Diverse use of NodeJS, Go, SQL and MongoDB for products that need from simplicity to distributed consistency.',
-			'RAG pipelines, image processing, and text extraction with embedded AI (TFLite) and cloud AI (Vertex AI).',
+			"Built and maintained integrations behind loyalty programs at Internacional Shopping, Nectar Market and Flamboyant's.",
+			'Built RAG pipelines on in-house invoice classification solutions and TFLite mobile implementation.',
+			'Full-stack development, legacy system maintenance and evolution.',
 		],
-		techs: ['Microservices', 'Golang', 'NestJS', 'SQL', 'MongoDB'],
+		techs: ['Golang', 'NestJS', 'AI/RAG', 'Grafana'],
 	},
 	{
 		company: 'Fascode',
@@ -55,17 +55,17 @@ export const EXPERIENCES: Experience[] = [
 			'Development of internal core products as well as custom client solutions.',
 			'Infrastructure architecture and maintenance across distributed projects.',
 		],
-		techs: ['Spring Boot', 'Podman', 'React', 'CI/CD'],
+		techs: ['Spring Boot', 'CI/CD', 'GitOps', 'Observability'],
 	},
 	{
 		company: 'Metria Sales',
 		role: 'Freelance Full Stack Developer',
 		link: 'https://metriasales.com/',
 		highlights: [
-			'Full-stack web and backend development for sales CRM.',
+			'Full-stack web and AI development for sales CRM.',
 			'DevOps, CI and deployment.',
 		],
-		techs: ['Node.js', 'MySQL', 'React', 'CI/CD'],
+		techs: ['Docker', 'Node.js', 'CI/CD'],
 	},
 ]
 
@@ -79,20 +79,20 @@ export const PROJECTS: Project[] = [
 	{
 		name: 'vops',
 		link: 'https://github.com/sh-lucas/vops',
-		techs: ['Go', 'Podman', 'Git'],
+		techs: ['Go', 'Podman', 'GitOps'],
 		desc: 'Self-host containers from a Git repo of Compose files. One Go binary with its own registry, rolling releases and rollback.',
 	},
 	{
 		name: 'honeypot-ops',
 		link: 'https://github.com/sh-lucas/honeypot-ops',
 		techs: ['NixOS', 'Kubernetes', 'FluxCD', 'SOPS'],
-		desc: 'The very soul of my K3s cluster. Secrets and keys proudly commited.',
+		desc: 'The very soul of my K3s cluster. Secrets and keys proudly committed.',
   },
   {
     name: 'libsql-handler',
     link: 'https://github.com/sh-lucas/libsql-handler',
     techs: ['Go', 'LibSQL', 'tcp'],
-    desc: 'Expose your sqlite on the web just like libsql/slqd, but as a golang handler.',
+    desc: 'Expose your sqlite on the web just like libsql/sqld, but as a golang handler.',
   },
 ]
 
@@ -110,7 +110,7 @@ export const PRODUCTION_EXCUSES = [
 	'A cosmic ray hit the exact transistor hosting the index page.',
 	'I forgot to renew the domain.',
 	'The CI/CD pipeline decided to rebuild the Universe.',
-	'A temporary log file currently weights 4.2TB.',
+	'A temporary log file currently weighs 4.2TB.',
 	'Someone ran a regex that is still backtracking from 1999.',
 	'The server is actually online, just not publicly reachable right now.',
 	"PHP's fault, actually.",
