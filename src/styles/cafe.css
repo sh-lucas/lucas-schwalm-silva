@@ -580,3 +580,25 @@ button:disabled {
 		grid-column: 1 / -1;
 	}
 }
+.cafe-skeleton {
+	display: flex;
+	flex-direction: column;
+	gap: 1.75rem;
+}
+.skeleton {
+	color: transparent;
+	background: var(--surface-raised);
+	border-color: transparent;
+	border-radius: var(--radius-sm);
+	-webkit-box-decoration-break: clone;
+	box-decoration-break: clone;
+	animation: skeleton-pulse 1.4s ease-in-out infinite;
+}
+.skeleton small {
+	color: transparent;
+}
+@keyframes skeleton-pulse {
+	50% {
+		opacity: 0.45;
+	}
+}

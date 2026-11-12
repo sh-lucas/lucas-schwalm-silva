@@ -8,7 +8,7 @@ import {
 	type Offer,
 	type RoundSummary,
 } from '../cafe-model'
-import { cafe } from '../cafe-api'
+import { cafe, hasSavedRound } from '../cafe-api'
 import {
 	type CafeJob,
 	type CafeRequest,
@@ -19,6 +19,7 @@ import {
 	restoreJobs,
 	secondsLeft,
 } from '../cafe-timing'
+import { CafeSkeleton } from './CafeSkeleton'
 
 const resourceNames = {
 	cash: 'credits',
@@ -51,6 +52,8 @@ export function CafeSection() {
 	const [state, setState] = useState<CafeState | null>(null)
 	const [recent, setRecent] = useState<RoundSummary[]>([])
 	const [loading, setLoading] = useState(true)
+	// Only the first read can show the skeleton; later polls keep the current screen.
+	const [resuming, setResuming] = useState(hasSavedRound)
 	const [error, setError] = useState('')
 	const [attempts, setAttempts] = useState<Attempt[]>([])
 	const [pending, setPending] = useState<CafeRequest | null>(null)
@@ -131,7 +134,10 @@ export function CafeSection() {
 				)
 		} finally {
 			busy.current = false
-			if (mounted.current) setLoading(false)
+			if (mounted.current) {
+				setLoading(false)
+				setResuming(false)
+			}
 		}
 	}, [apply])
 
@@ -319,7 +325,9 @@ export function CafeSection() {
 				</p>
 			</div>
 
-			{!state ? (
+			{!state && resuming ? (
+				<CafeSkeleton />
+			) : !state ? (
 				<div className="cafe-opening">
 					<div className="cafe-cup" aria-hidden="true">
 						<div className="cup-body" />
@@ -670,7 +678,6 @@ export function CafeSection() {
 			)}
 			<div className="cafe-feedback" aria-live="polite" aria-atomic="true">
 				{error && <p role="alert">{error}</p>}
-				{loading && state && <p>Checking the ledger…</p>}
 			</div>
 			{pending && !loading && (
 				<button
@@ -688,7 +695,7 @@ export function CafeSection() {
 				disabled={loading}
 				onClick={refresh}
 			>
-				Refresh from the ledger
+				{loading ? 'Checking the ledger…' : 'Refresh from the ledger'}
 			</button>
 			<section className="recent-rounds" aria-labelledby="recent-title">
 				<div className="section-head">

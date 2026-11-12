@@ -90,6 +90,15 @@ function currentRound() {
 		: undefined
 }
 
+// Synchronous hint for the first paint; also runs during prerender, where there is no storage.
+export function hasSavedRound() {
+	try {
+		return currentRound() !== undefined
+	} catch {
+		return false
+	}
+}
+
 interface Transaction {
 	id: string
 	memo?: string
