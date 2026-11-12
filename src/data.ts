@@ -75,7 +75,7 @@ export const PROJECTS: Project[] = [
 	{
 		name: 'Plinth',
 		link: 'https://about.plinth.sh-lucas.dev',
-		techs: ['Web API'],
+		techs: ['Rust', 'Auditable by design', 'TTD'],
 		desc: 'A balance engine with configurable rules that handles concurrency, auditing and consistency for you.',
 	},
 	{
