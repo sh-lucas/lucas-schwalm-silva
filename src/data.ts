@@ -16,6 +16,7 @@ export interface SystemMetrics {
 export interface Experience {
 	company: string
 	role: string
+	period?: string
 	link: string
 	highlights: string[]
 	techs: string[]
@@ -39,6 +40,7 @@ export const EXPERIENCES: Experience[] = [
 	{
 		company: 'Roxcode',
 		role: 'Full Stack Developer',
+		period: 'May 2025 – today',
 		link: 'https://roxcode.io/',
 		highlights: [
 			"Built and maintained integrations behind loyalty programs at Internacional Shopping, Nectar Market and Flamboyant's.",
@@ -49,13 +51,13 @@ export const EXPERIENCES: Experience[] = [
 	},
 	{
 		company: 'Fascode',
-		role: 'Development, DevOps & Consulting',
+		role: 'DevOps and Architect',
 		link: 'https://www.fascode.com.br/',
 		highlights: [
 			'Development of internal core products as well as custom client solutions.',
 			'Infrastructure architecture and maintenance across distributed projects.',
 		],
-		techs: ['Spring Boot', 'CI/CD', 'GitOps', 'Observability'],
+		techs: ['Spring Boot', 'CI/CD', 'GitOps', 'Grafana'],
 	},
 	{
 		company: 'Metria Sales',
@@ -86,7 +88,7 @@ export const PROJECTS: Project[] = [
 		name: 'honeypot-ops',
 		link: 'https://github.com/sh-lucas/honeypot-ops',
 		techs: ['NixOS', 'Kubernetes', 'FluxCD', 'SOPS'],
-		desc: 'The very soul of my K3s cluster. Secrets and keys proudly committed.',
+		desc: 'The very soul of my K3s cluster. Fully reproducible from Git, secrets included (SOPS-encrypted).',
   },
   {
     name: 'libsql-handler',

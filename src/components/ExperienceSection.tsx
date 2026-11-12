@@ -20,6 +20,9 @@ export function ExperienceSection() {
 							>
 								@ {exp.company}
 							</a>
+							{exp.period && (
+								<span className="experience-period">{exp.period}</span>
+							)}
 						</div>
 
 						<ul className="experience-highlights">

@@ -28,6 +28,10 @@
 .experience-company:hover {
 	text-decoration-color: currentColor;
 }
+.experience-period {
+	color: var(--text-tertiary);
+	font-size: 0.8125rem;
+}
 .experience-highlights {
 	margin: 1rem 0 0 1.1rem;
 	display: flex;
