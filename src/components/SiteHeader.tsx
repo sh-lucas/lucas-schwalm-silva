@@ -1,13 +1,3 @@
-function calculateAge(): number {
-	const birthDate = new Date('2005-02-02')
-	const now = new Date()
-	let age = now.getFullYear() - birthDate.getFullYear()
-	if (now.getMonth() < 1 || (now.getMonth() === 1 && now.getDate() < 2)) {
-		age--
-	}
-	return age
-}
-
 export function SiteHeader() {
 	return (
 		<header className="site-header">
