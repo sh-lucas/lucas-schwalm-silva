@@ -108,3 +108,15 @@ button {
 		scroll-behavior: auto !important;
 	}
 }
+
+/* Button that looks like a text link (e.g. "Download PDF") */
+button.social-btn {
+	background: none;
+	border: 0;
+	cursor: pointer;
+	font-size: 0.875rem;
+}
+
+.print-only {
+	display: none;
+}

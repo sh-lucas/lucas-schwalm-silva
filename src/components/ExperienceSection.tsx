@@ -5,6 +5,13 @@ export function ExperienceSection() {
 		<section className="fade-in" aria-label="Experience">
 			<div className="section-head">
 				<h2 className="section-head-title">Experience</h2>
+				<button
+					type="button"
+					className="section-head-meta social-btn no-print"
+					onClick={() => window.print()}
+				>
+					Download PDF
+				</button>
 			</div>
 
 			<div className="experience-list">
